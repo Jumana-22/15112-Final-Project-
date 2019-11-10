@@ -216,9 +216,10 @@ class game:
     def redrawGameWindow(self):
         # resetting window to background
         self.wnd.blit(self.bg, (0, 3 * 15))
+        """
         #drawing wall
         for w in self.walls:
-            w.draw(self.wnd)
+            w.draw(self.wnd)"""
         #draw food
         for f in self.foods:
             f.draw(self.wnd)
@@ -329,11 +330,11 @@ class game:
             self.foods.append(food((i*15),((20+3)*15),10))
         for i in range(15,27):
             self.foods.append(food((i*15),((20+3)*15),10))
-        for i in range(1,4):
+        for i in range(2,4):
             self.foods.append(food((i*15),((23+3)*15),10))
         for i in range(6,22):
             self.foods.append(food((i*15),((23+3)*15),10))
-        for i in range(24,27):
+        for i in range(24,26):
             self.foods.append(food((i*15),((23+3)*15),10))
         for i in range(1,7):
             self.foods.append(food((i*15),((26+3)*15),10))
@@ -345,5 +346,96 @@ class game:
             self.foods.append(food((i*15),((26+3)*15),10))
         for i in range(1,27):
             self.foods.append(food((i*15),((29+3)*15),10))
+        #food in a vertical line
+        for i in range(2,3):
+            self.foods.append(food((1*15),((i+3)*15),10))
+        for i in range(4,5):
+            self.foods.append(food((1*15),((i+3)*15),10))
+        for i in range(2,5):
+            self.foods.append(food((6*15),((i+3)*15),10))
+        for i in range(2,5):
+            self.foods.append(food((12*15),((i+3)*15),10))
+        for i in range(2,5):
+            self.foods.append(food((15*15),((i+3)*15),10))
+        for i in range(2,5):
+            self.foods.append(food((21*15),((i+3)*15),10))
+        for i in range(2,3):
+            self.foods.append(food((26*15),((i+3)*15),10))
+        for i in range(4,5):
+            self.foods.append(food((26*15),((i+3)*15),10))
+        for i in range(6,8):
+            self.foods.append(food((1*15),((i+3)*15),10))
+        for i in range(6,8):
+            self.foods.append(food((6*15),((i+3)*15),10))
+        for i in range(6,8):
+            self.foods.append(food((9*15),((i+3)*15),10))
+        for i in range(6,8):
+            self.foods.append(food((18*15),((i+3)*15),10))
+        for i in range(6,8):
+            self.foods.append(food((21*15),((i+3)*15),10))
+        for i in range(6,8):
+            self.foods.append(food((26*15),((i+3)*15),10))
+        for i in range(9,14):
+            self.foods.append(food((6*15),((i+3)*15),10))
+        for i in range(9,14):
+            self.foods.append(food((21*15),((i+3)*15),10))
+        for i in range(9,11):
+            self.foods.append(food((12*15),((i+3)*15),10))
+        for i in range(9,11):
+            self.foods.append(food((15*15),((i+3)*15),10))
+        for i in range(12,14):
+            self.foods.append(food((9*15),((i+3)*15),10))
+        for i in range(12,14):
+            self.foods.append(food((18*15),((i+3)*15),10))
+        for i in range(15,20):
+            self.foods.append(food((6*15),((i+3)*15),10))
+        for i in range(15,20):
+            self.foods.append(food((21*15),((i+3)*15),10))
+        for i in range(15,17):
+            self.foods.append(food((9*15),((i+3)*15),10))
+        for i in range(15,17):
+            self.foods.append(food((18*15),((i+3)*15),10))
+        for i in range(18,20):
+            self.foods.append(food((9*15),((i+3)*15),10))
+        for i in range(18,20):
+            self.foods.append(food((18*15),((i+3)*15),10))
+        for i in range(21,23):
+            self.foods.append(food((1*15),((i+3)*15),10))
+        for i in range(21,23):
+            self.foods.append(food((6*15),((i+3)*15),10))
+        for i in range(21,23):
+            self.foods.append(food((12*15),((i+3)*15),10))
+        for i in range(21,23):
+            self.foods.append(food((15*15),((i+3)*15),10))
+        for i in range(21,23):
+            self.foods.append(food((21*15),((i+3)*15),10))
+        for i in range(21,23):
+            self.foods.append(food((26*15),((i+3)*15),10))
+        for i in range(24,26):
+            self.foods.append(food((3*15),((i+3)*15),10))
+        for i in range(24,26):
+            self.foods.append(food((6*15),((i+3)*15),10))
+        for i in range(24,26):
+            self.foods.append(food((9*15),((i+3)*15),10))
+        for i in range(24,26):
+            self.foods.append(food((18*15),((i+3)*15),10))
+        for i in range(24,26):
+            self.foods.append(food((21*15),((i+3)*15),10))
+        for i in range(24,26):
+            self.foods.append(food((24*15),((i+3)*15),10))
+        for i in range(27,29):
+            self.foods.append(food((1*15),((i+3)*15),10))
+        for i in range(27,29):
+            self.foods.append(food((12*15),((i+3)*15),10))
+        for i in range(27,29):
+            self.foods.append(food((15*15),((i+3)*15),10))
+        for i in range(27,29):
+            self.foods.append(food((26*15),((i+3)*15),10))
+        #50 point foods
+        self.foods.append(food((1*15),((3+3)*15),50))
+        self.foods.append(food((26*15),((3+3)*15),50))
+        self.foods.append(food((1*15),((23+3)*15),50))
+        self.foods.append(food((26*15),((23+3)*15),50))
+
 #Starting the application
 App = welcomeWnd()
