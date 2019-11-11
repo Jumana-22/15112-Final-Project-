@@ -93,16 +93,30 @@ class pacman:
         return True
 
 class ghost:
+    blinkyPics = [pygame.image.load("blinkyL.png"),pygame.image.load("blinkyR.png"),
+                  pygame.image.load("blinkyU.png"),pygame.image.load("blinkyD.png")]
+    pinkyPics = [pygame.image.load("pinkyL.png"),pygame.image.load("pinkyR.png"),
+                 pygame.image.load("pinkyU.png"),pygame.image.load("pinkyD.png")]
+    inkyPics = [pygame.image.load("inkyL.png"),pygame.image.load("inkyR.png"),
+                pygame.image.load("inkyU.png"),pygame.image.load("inkyD.png")]
+    clydePics = [pygame.image.load("clydeL.png"),pygame.image.load("clydeR.png"),
+                 pygame.image.load("clydeU.png"),pygame.image.load("clydeD.png")]
     def __init__(self,x,y,c,w):
+        #ghost location
         self.x = x
         self.y = y
+        #ghost dimentsions
         self.width = 15
         self.height = 15
+        #ghost motion variables
         self.speed = 5
+        self.vel = [-1, 0]
+        #ghost type
         self.color = c
-        self.vel = [-1,0]
+        #ghost design / look
+        self.images = self.setImages()
         self.target = self.calTarget()
-        #images for
+        #walls in the game used for ghost AI
         self.walls = w
 
     #calculate traget position based on color / ghost type 
@@ -113,12 +127,12 @@ class ghost:
     #moves ghost in the direction of dir
     def move(self):
         self.calTarget()
-        if self.vel[0]:
-            if self.validM([self.x + self.speed,self.y]):
-                self.x += self.speed
-        if self.vel[1]:
-            if self.validM([self.x,self.y + self.speed]):
-                self.x += self.speed
+        if self.vel[0] != 0:
+            if self.validM([self.x + self.speed*self.vel[0],self.y]):
+                self.x += self.speed*self.vel[0]
+        if self.vel[1] != 0:
+            if self.validM([self.x,self.y + self.speed*self.vel[1]]):
+                self.x += self.speed*self.vel[1]
 
     # decides whether the movement is valid or not
     """Returns True if character doesnt collide with any walls
@@ -134,7 +148,25 @@ class ghost:
     
     #loads ghost into window
     def draw(self,wnd):
-        pass
+        if self.vel[0] == 1:
+            wnd.blit(self.images[1],(self.x,self.y))
+        elif self.vel[0] == -1:
+            wnd.blit(self.images[0],(self.x,self.y))
+        elif self.vel[1] == 1:
+            wnd.blit(self.images[2],(self.x,self.y))
+        else:
+            wnd.blit(self.images[3],(self.x,self.y))
+
+    #Setting the right list of images for that type of ghost
+    def setImages(self):
+        if self.color == "red":
+            return self.blinkyPics
+        elif self.color == "pink":
+            return self.pinkyPics
+        elif self.color == "blue":
+            return self.inkyPics
+        elif self.color == "orange":
+            return self.clydePics
 
 class wall: 
     def __init__(self,x,y,width,length):
