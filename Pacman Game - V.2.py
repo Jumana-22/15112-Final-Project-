@@ -226,15 +226,15 @@ class game:
 
         #While the level is running
         self.run = True
-
         #current score
         self.score = 0
-
+        #if game is paused
+        self.paused = False
         #start the level
         self.startGame()
 
     def startGame(self):
-        while self.run:
+        while self.run and (not self.paused):
             #setting frames per second
             self.clock.tick(8)
             #updating window
@@ -246,28 +246,53 @@ class game:
                     self.run = False
             self.getUserInput()
             self.moveChars()
-        #quiting pygame
-        pygame.quit()
+        if self.run == False:
+            #quiting pygame
+            pygame.quit()
 
     def getUserInput(self):
         #getting keys pressed
         keys = pygame.key.get_pressed()
         #Turning pacman to face right if valid move
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             if self.pac.validM([self.pac.x + self.pac.speed,self.pac.y]):
                 self.pac.vel = [1,0]
         #Turning pacman to face left if valid move
-        elif keys[pygame.K_LEFT]:
+        elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
             if self.pac.validM([self.pac.x - self.pac.speed,self.pac.y]):
                 self.pac.vel = [-1,0]
         #Turning pacman to face up if valid move
-        elif keys[pygame.K_UP]:
+        elif keys[pygame.K_UP] or keys[pygame.K_w]:
             if self.pac.validM([self.pac.x,self.pac.y - self.pac.speed]):
                 self.pac.vel = [0,1]
         #Turning pacman to face down if valid move
-        elif keys[pygame.K_DOWN]:
+        elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
             if self.pac.validM([self.pac.x, self.pac.y + self.pac.speed]):
                 self.pac.vel = [0,-1]
+        #pausing the game
+        if keys[pygame.K_SPACE] or keys[pygame.K_ESCAPE] or keys[pygame.K_p]:
+            self.pauseG()
+
+    #when the game is paused
+    def pauseG(self):
+        self.paused = True
+        # display pause message
+        font = pygame.font.SysFont("comicsans",30)
+        pauseTxt = font.render("PAUSED",1,(255,0,0),(0,0,0))
+        self.wnd.blit(pauseTxt,(11*15+5,20*15))
+        pygame.display.update()
+        while self.paused == True:
+            #if window closed
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    # Close window without causing error message
+                    self.paused = False
+                    self.run = False
+            #keys pressed
+            keys = pygame.key.get_pressed()
+            #if unpaused
+            if keys[pygame.K_c]:
+                self.paused = False
 
     def redrawGameWindow(self):
         # resetting window to background
