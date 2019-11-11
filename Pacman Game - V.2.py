@@ -252,20 +252,22 @@ class game:
     def getUserInput(self):
         #getting keys pressed
         keys = pygame.key.get_pressed()
-        #Turning pacman to face right
+        #Turning pacman to face right if valid move
         if keys[pygame.K_RIGHT]:
-            self.pac.vel = [1,0]
-        #Turning pacman to face left
+            if self.pac.validM([self.pac.x + self.pac.speed,self.pac.y]):
+                self.pac.vel = [1,0]
+        #Turning pacman to face left if valid move
         elif keys[pygame.K_LEFT]:
-            self.pac.vel = [-1,0]
-        #Turning pacman to face up
+            if self.pac.validM([self.pac.x - self.pac.speed,self.pac.y]):
+                self.pac.vel = [-1,0]
+        #Turning pacman to face up if valid move
         elif keys[pygame.K_UP]:
-            self.pac.vel = [0,1]
-        #Turning pacman to face down
+            if self.pac.validM([self.pac.x,self.pac.y - self.pac.speed]):
+                self.pac.vel = [0,1]
+        #Turning pacman to face down if valid move
         elif keys[pygame.K_DOWN]:
-            self.pac.vel = [0,-1]
-
-
+            if self.pac.validM([self.pac.x, self.pac.y + self.pac.speed]):
+                self.pac.vel = [0,-1]
 
     def redrawGameWindow(self):
         # resetting window to background
