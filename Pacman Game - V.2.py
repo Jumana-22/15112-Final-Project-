@@ -227,6 +227,9 @@ class game:
         #While the level is running
         self.run = True
 
+        #current score
+        self.score = 0
+
         #start the level
         self.startGame()
 
@@ -268,11 +271,23 @@ class game:
 
     def moveChars(self):
         #move all the characters once
+        self.AddScore()
         self.pac.move()
         self.blinky.move()
         self.pinky.move()
         self.inky.move()
         self.clyde.move()
+        #self.AddScore()
+
+    def AddScore(self):
+        #each if pacman character collides with any of foods
+        for f in self.foods:
+            if f.x <= self.pac.x < (f.x + f.width) or f.x <= ((self.pac.x + self.pac.width) < (f.x + f.width)):
+                if f.y <= self.pac.y < (f.y + f.length) or f.y <= ((self.pac.y + self.pac.height) < (f.y + f.length)):
+                    #add the food worth to score
+                    self.score += f.worth
+                    #remove food from foods list
+                    self.foods.pop(self.foods.index(f))
 
     def createWalls(self):
         #borders / outer walls 
