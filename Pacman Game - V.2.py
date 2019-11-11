@@ -140,8 +140,8 @@ class ghost:
     def validM(self, location):
         # each if in any of the walls
         for w in self.walls:
-            if w.x <= location[0] and ((location[0] + self.width) <= (w.x + w.width)):
-                if w.y <= location[1] and ((location[1] +self.height) <= (w.y + w.length)):
+            if w.x < location[0] < (w.x + w.width) or w.x < ((location[0] + self.width) < (w.x + w.width)):
+                if w.y < location[1] < (w.y + w.length) or w.y < ((location[1] + self.height) < (w.y + w.length)):
                     return False
         # Return True otherwise
         return True
