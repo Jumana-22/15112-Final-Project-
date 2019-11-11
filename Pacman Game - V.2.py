@@ -42,7 +42,7 @@ class pacman:
         self.y = y
         self.width = 15
         self.height = 15
-        self.speed = 5
+        self.speed = 15
         #determines direction movement (vector)
         self.vel = [-1,0]
         #used for animation
@@ -76,9 +76,9 @@ class pacman:
         if self.vel[0] != 0:
             if self.validM([self.x + self.speed*self.vel[0],self.y]):
                 self.x += self.speed*self.vel[0]
-        if self.vel[1] != 0:
-            if self.validM([self.x,self.y + self.speed*self.vel[1]]):
-                self.x += self.speed*self.vel[1]
+        elif self.vel[1] != 0:
+            if self.validM([self.x,(self.y + self.speed*self.vel[1]*(-1))]):
+                self.y += self.speed*self.vel[1]*(-1)
 
     #decides whether the movement is valid or not
     """Returns True if character doesnt collide with any walls
@@ -86,8 +86,8 @@ class pacman:
     def validM(self,location):
         #each if in any of the walls
         for w in self.walls:
-            if w.x < location[0] < (w.x + w.width) or w.x < ((location[0] + self.width) < (w.x + w.width)):
-                if w.y < location[1] < (w.y + w.length) or w.y < ((location[1] + self.height) < (w.y + w.length)):
+            if (w.x <= location[0] < (w.x + w.width)) or (w.x < ((location[0] + self.width) < (w.x + w.width))):
+                if (w.y <= location[1] < (w.y + w.length)) or (w.y < ((location[1] + self.height) < (w.y + w.length))):
                     return False
         #Return True otherwise
         return True
@@ -109,7 +109,7 @@ class ghost:
         self.width = 15
         self.height = 15
         #ghost motion variables
-        self.speed = 5
+        self.speed = 15
         self.vel = [-1, 0]
         #ghost type
         self.color = c
@@ -131,8 +131,8 @@ class ghost:
             if self.validM([self.x + self.speed*self.vel[0],self.y]):
                 self.x += self.speed*self.vel[0]
         if self.vel[1] != 0:
-            if self.validM([self.x,self.y + self.speed*self.vel[1]]):
-                self.x += self.speed*self.vel[1]
+            if self.validM([self.x,self.y + self.speed*self.vel[1]*(-1)]):
+                self.y += self.speed*self.vel[1]*(-1)
 
     # decides whether the movement is valid or not
     """Returns True if character doesnt collide with any walls
@@ -140,8 +140,8 @@ class ghost:
     def validM(self, location):
         # each if in any of the walls
         for w in self.walls:
-            if w.x < location[0] < (w.x + w.width) or w.x < ((location[0] + self.width) < (w.x + w.width)):
-                if w.y < location[1] < (w.y + w.length) or w.y < ((location[1] + self.height) < (w.y + w.length)):
+            if w.x <= location[0] < (w.x + w.width) or w.x < ((location[0] + self.width) < (w.x + w.width)):
+                if w.y <= location[1] < (w.y + w.length) or w.y < ((location[1] + self.height) < (w.y + w.length)):
                     return False
         # Return True otherwise
         return True
@@ -236,7 +236,7 @@ class game:
     def startGame(self):
         while self.run:
             #setting frames per second
-            self.clock.tick(15)
+            self.clock.tick(8)
             #updating window
             self.redrawGameWindow()
             # getting all inputs from user like mouse movement
@@ -244,9 +244,28 @@ class game:
                 if event.type == pygame.QUIT:
                     # Close window without causing error message
                     self.run = False
+            self.getUserInput()
             self.moveChars()
         #quiting pygame
         pygame.quit()
+
+    def getUserInput(self):
+        #getting keys pressed
+        keys = pygame.key.get_pressed()
+        #Turning pacman to face right
+        if keys[pygame.K_RIGHT]:
+            self.pac.vel = [1,0]
+        #Turning pacman to face left
+        elif keys[pygame.K_LEFT]:
+            self.pac.vel = [-1,0]
+        #Turning pacman to face up
+        elif keys[pygame.K_UP]:
+            self.pac.vel = [0,1]
+        #Turning pacman to face down
+        elif keys[pygame.K_DOWN]:
+            self.pac.vel = [0,-1]
+
+
 
     def redrawGameWindow(self):
         # resetting window to background
