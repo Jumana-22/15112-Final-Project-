@@ -38,15 +38,20 @@ class pacman:
                 pygame.image.load('pmD2.png'),pygame.image.load('pmD3.png')]
     def __init__(self,x,y,w):
         #Basic attributes
+        #location
         self.x = x
         self.y = y
+        #dimensions
         self.width = 15
         self.height = 15
+        #number of pixels it moves every time
         self.speed = 15
         #determines direction movement (vector)
         self.vel = [-1,0]
         #used for animation
         self.moveCount = 0
+        #number of lives
+        self.lives = 3
 
         #walls that restrict movement
         self.walls = w
@@ -115,18 +120,67 @@ class ghost:
         self.color = c
         #ghost design / look
         self.images = self.setImages()
-        self.target = self.calTarget()
+        self.target = (0,0)
         #walls in the game used for ghost AI
         self.walls = w
 
-    #calculate traget position based on color / ghost type 
-    def calTarget(self):
-        #change the velocity of the ghost
-        pass
+    #calls AI method based on color / ghost type
+    def callAI(self,pacLocation):
+        if self.color == "red":
+            self.blinkyAI(pacLocation)
+        elif self.color == "pink":
+            self.blinkyAI(pacLocation)
+        elif self.color == "blue":
+            self.blinkyAI(pacLocation)
+        elif self.color == "orange":
+            self.blinkyAI(pacLocation)
 
-    #moves ghost in the direction of dir
-    def move(self):
-        self.calTarget()
+    #red ghost (blinky) AI
+    #responsible for movement decision
+    def blinkyAI(self,pacLocation):
+        self.target = pacLocation
+        possibleDir = self.possibleDirection()
+        self.minDistance(possibleDir)
+
+    def minDistance(self,possibleDir):
+        #list to store calculated distances
+        distances = []
+        #calculating the distance from potenital location to target location
+        for i in possibleDir:
+            x = self.target[0] - (self.x + self.speed*i[0])
+            y = self.target[1] - (self.y + self.speed*i[1]*(-1))
+            dist = (((x)**2)+((y)**2))**(0.5)
+            distances.append(dist)
+        #finding the minimum distance
+        minDist = distances[0]
+        for i in range(1,len(distances)):
+            if distances[i] < minDist:
+                minDist = distances[i]
+        #getting direction that gets min distance
+        bestDir = possibleDir[distances.index(minDist)]
+        #setting the best direction as velocity
+        self.vel = [bestDir[0],bestDir[1]]
+
+    #determines all the possible directions that the ghost could turn
+    def possibleDirection(self):
+        #ghosts not allowed to turn 180 degrees
+        if self.vel == [1,0]:
+            possibleDir = [(1,0),(0,1),(0,-1)]
+        elif self.vel == [-1,0]:
+            possibleDir = [(-1, 0),(0, 1),(0, -1)]
+        elif self.vel == [0,1]:
+            possibleDir = [(1,0),(-1,0),(0,1)]
+        elif self.vel == [0,-1]:
+            possibleDir = [(1,0),(-1,0),(0,-1)]
+        temp = list(possibleDir)
+        for direction in temp:
+            if not self.validM([self.x + self.speed*direction[0],self.y + self.speed*direction[1]*(-1)]):
+                possibleDir.remove(direction)
+        return possibleDir
+
+    #moves ghost based on individual AI
+    def move(self,pacLocation):
+        self.callAI(pacLocation)
         if self.vel[0] != 0:
             if self.validM([self.x + self.speed*self.vel[0],self.y]):
                 self.x += self.speed*self.vel[0]
@@ -295,8 +349,10 @@ class game:
                 self.paused = False
 
     def redrawGameWindow(self):
+        #resetting the window to black
+        self.wnd.fill((0,0,0))
         # resetting window to background
-        self.wnd.blit(self.bg, (0, 3 * 15))
+        self.wnd.blit(self.bg,(0,3*15))
         """
         #drawing wall
         for w in self.walls:
@@ -317,13 +373,13 @@ class game:
 
     def moveChars(self):
         #move all the characters once
-        self.AddScore()
-        self.pac.move()
-        self.blinky.move()
-        self.pinky.move()
-        self.inky.move()
-        self.clyde.move()
         #self.AddScore()
+        self.pac.move()
+        self.blinky.move((self.pac.x,self.pac.y))
+        self.pinky.move((self.pac.x,self.pac.y))
+        self.inky.move((self.pac.x,self.pac.y))
+        self.clyde.move((self.pac.x,self.pac.y))
+        self.AddScore()
 
     def AddScore(self):
         #each if pacman character collides with any of foods
