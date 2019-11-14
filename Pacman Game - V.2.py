@@ -12,19 +12,83 @@ class welcomeWnd:
     def __init__(self):
         self.wnd = tk.Tk()
         self.wnd.title("Welcome to PacMan")
-        self.startB = tk.Button(self.wnd, text="Start Game", command= self.startG)
+        self.wnd.geometry("900x550")
+        self.wnd.configure(bg="black")
+        #Display Game Title
+        self.gameTPic = tk.PhotoImage(file="Pacman Title.png")
+        self.gameTL = tk.Label(self.wnd,image=self.gameTPic,bd=0)
+        self.gameTL.pack()
+        #Start game button
+        self.startB = tk.Button(self.wnd, text="START GAME", command= self.startG)
+        self.startB.configure(font=("fixedsys",35),bg="black",fg="yellow2",relief="flat")
+        self.startB.configure(activebackground="black",activeforeground="gold4",bd=0)
         self.startB.pack()
+        #high scores button
+        self.hScoreB = tk.Button(self.wnd, text="HIGH SCORES",command=self.highScoreD())
+        self.hScoreB.configure(font=("fixedsys",20),bg="black",fg="cyan2",relief="flat")
+        self.hScoreB.configure(activebackground="black",activeforeground="cyan4",bd=0)
+        self.hScoreB.pack()
+        #how to play button
+        self.hTPlayB = tk.Button(self.wnd, text="HOW TO PLAY",command=self.hTPlayD())
+        self.hTPlayB.configure(font=("fixedsys",20),bg="black",fg="SpringGreen2",relief="flat")
+        self.hTPlayB.configure(activebackground="black",activeforeground="green4",bd=0)
+        self.hTPlayB.flash()
+        self.hTPlayB.pack()
+        #animation
+        #fixing position for animation canvas
+        self.lb = tk.Label(self.wnd,height=2,bg="black")
+        self.lb.pack(side="bottom")
+        self.animationC = tk.Canvas(self.wnd, width=900, height=50)
+        self.animationC.pack(side="bottom")
+        self.animationCounter = 0
+        #Declare images for animation
+        self.faceingL = [tk.PhotoImage(file='pmL0.png'), tk.PhotoImage(file='pmL0.png'),
+                    tk.PhotoImage(file='pmL2.png'), tk.PhotoImage(file='pmL3.png')]
+        self.faceingR = [tk.PhotoImage(file='pmR0.png'), tk.PhotoImage(file='pmR1.png'),
+                    tk.PhotoImage(file='pmR2.png'), tk.PhotoImage(file='pmR3.png')]
+        self.blinky = [tk.PhotoImage(file="blinkyR.png"),tk.PhotoImage(file="blinkyL.png")]
+        self.pinky = [tk.PhotoImage(file="pinkyR.png"),tk.PhotoImage(file="pinkyL.png")]
+        self.inky = [tk.PhotoImage(file="inkyR.png"),tk.PhotoImage(file="inkyL.png")]
+        self.clyde = [tk.PhotoImage(file="clydeR.png"),tk.PhotoImage(file="clydeL.png")]
+        #keeping track of animation direction
+        self.goingR = True
+        #calling animation function
+        self.animationC.after(100, self.animation)
         #Doesnt allow users to rezie the window
         #Must be added after adding everything in window
         self.wnd.resizable(0,0)
         #Add as the last attribute
         self.wnd.mainloop()
 
+    def animation(self):
+        self.animationC.delete(tk.ALL)
+        pos = 10*self.animationCounter
+        if pos < 1000 and self.goingR == True:
+            self.animationC.create_image(pos,10,image=self.faceingR[self.animationCounter%4])
+            self.animationC.create_image(1.03*(pos-50),10,image=self.blinky[0])
+            self.animationCounter += 1
+        else:
+            self.goingR = False
+        if pos > -100 and self.goingR == False:
+            self.animationC.create_image(pos,10,image=self.faceingL[self.animationCounter % 4])
+            self.animationC.create_image(1.3*(pos+15),10,image=self.blinky[1])
+            self.animationCounter -= 1
+        else:
+            self.goingR = True
+        self.animationC.after(100, self.animation)
+
     #Pressing the start button
     def startG(self):
         self.wnd.destroy()
-        thisGame = game()
+        game()
 
+    #Pressing the high scores button to display hScore wnd
+    def highScoreD(self):
+        pass
+
+    #Pressing the hTPlay button to display
+    def hTPlayD(self):
+        pass
 
 class pacman:
     #Declare images for pacman animation
@@ -356,7 +420,8 @@ class game:
         """
         #drawing wall
         for w in self.walls:
-            w.draw(self.wnd)"""
+            w.draw(self.wnd)
+        """
         #draw food
         for f in self.foods:
             f.draw(self.wnd)
