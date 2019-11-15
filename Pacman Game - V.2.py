@@ -10,8 +10,9 @@ pygame.init()
 - Exit"""
 class welcomeWnd:
     def __init__(self):
+        #tkinter window
         self.wnd = tk.Tk()
-        self.wnd.title("Welcome to PacMan")
+        self.wnd.title("Welcome to Pac-Man")
         self.wnd.geometry("900x550")
         self.wnd.configure(bg="black")
         #Display Game Title
@@ -32,24 +33,25 @@ class welcomeWnd:
         self.hTPlayB = tk.Button(self.wnd, text="HOW TO PLAY",command=self.hTPlayD())
         self.hTPlayB.configure(font=("fixedsys",20),bg="black",fg="SpringGreen2",relief="flat")
         self.hTPlayB.configure(activebackground="black",activeforeground="green4",bd=0)
-        self.hTPlayB.flash()
         self.hTPlayB.pack()
         #animation
         #fixing position for animation canvas
         self.lb = tk.Label(self.wnd,height=2,bg="black")
         self.lb.pack(side="bottom")
-        self.animationC = tk.Canvas(self.wnd, width=900, height=50)
+        self.animationC = tk.Canvas(self.wnd,width=900,height=50,bg="black",highlightthickness=0)
         self.animationC.pack(side="bottom")
         self.animationCounter = 0
         #Declare images for animation
-        self.faceingL = [tk.PhotoImage(file='pmL0.png'), tk.PhotoImage(file='pmL0.png'),
-                    tk.PhotoImage(file='pmL2.png'), tk.PhotoImage(file='pmL3.png')]
-        self.faceingR = [tk.PhotoImage(file='pmR0.png'), tk.PhotoImage(file='pmR1.png'),
-                    tk.PhotoImage(file='pmR2.png'), tk.PhotoImage(file='pmR3.png')]
-        self.blinky = [tk.PhotoImage(file="blinkyR.png"),tk.PhotoImage(file="blinkyL.png")]
-        self.pinky = [tk.PhotoImage(file="pinkyR.png"),tk.PhotoImage(file="pinkyL.png")]
-        self.inky = [tk.PhotoImage(file="inkyR.png"),tk.PhotoImage(file="inkyL.png")]
-        self.clyde = [tk.PhotoImage(file="clydeR.png"),tk.PhotoImage(file="clydeL.png")]
+        #pacman images
+        self.faceingL = [tk.PhotoImage(file='WpmL0.png'), tk.PhotoImage(file='WpmL0.png'),
+                    tk.PhotoImage(file='WpmL2.png'), tk.PhotoImage(file='WpmL3.png')]
+        self.faceingR = [tk.PhotoImage(file='WpmR0.png'), tk.PhotoImage(file='WpmR1.png'),
+                    tk.PhotoImage(file='WpmR2.png'), tk.PhotoImage(file='WpmR3.png')]
+        #ghosts images - [right direction, left direction]
+        self.blinky = [tk.PhotoImage(file="WblinkyR.png"),tk.PhotoImage(file="WblinkyL.png")]
+        self.pinky = [tk.PhotoImage(file="WpinkyR.png"),tk.PhotoImage(file="WpinkyL.png")]
+        self.inky = [tk.PhotoImage(file="WinkyR.png"),tk.PhotoImage(file="WinkyL.png")]
+        self.clyde = [tk.PhotoImage(file="WclydeR.png"),tk.PhotoImage(file="WclydeL.png")]
         #keeping track of animation direction
         self.goingR = True
         #calling animation function
@@ -60,21 +62,36 @@ class welcomeWnd:
         #Add as the last attribute
         self.wnd.mainloop()
 
+    #The animation on the welcome window
     def animation(self):
+        #resit canvas
         self.animationC.delete(tk.ALL)
+        #calculating main x location in the canvas
         pos = 10*self.animationCounter
-        if pos < 1000 and self.goingR == True:
-            self.animationC.create_image(pos,10,image=self.faceingR[self.animationCounter%4])
-            self.animationC.create_image(1.03*(pos-50),10,image=self.blinky[0])
+        #if heading towards the right & still in window
+        if pos < 1250 and self.goingR == True:
+            self.animationC.create_image(pos,30,image=self.faceingR[self.animationCounter%4])
+            self.animationC.create_image(1.03*(pos-70),30,image=self.blinky[0])
+            self.animationC.create_image((pos-100),30,image=self.pinky[0])
+            self.animationC.create_image((pos-170),30,image=self.inky[0])
+            self.animationC.create_image(0.9*(pos-220),30,image=self.clyde[0])
             self.animationCounter += 1
-        else:
+        elif self.goingR == True:
+            #change motion direction
             self.goingR = False
-        if pos > -100 and self.goingR == False:
-            self.animationC.create_image(pos,10,image=self.faceingL[self.animationCounter % 4])
-            self.animationC.create_image(1.3*(pos+15),10,image=self.blinky[1])
+            self.animationCounter -= 10
+        #if heading in the left direction & still in window
+        if pos > -250 and self.goingR == False:
+            self.animationC.create_image(pos,30,image=self.faceingL[self.animationCounter % 4])
+            self.animationC.create_image((pos+230),30,image=self.clyde[1])
+            self.animationC.create_image((pos+130),30,image=self.pinky[1])
+            self.animationC.create_image(1.1*(pos+40),30,image=self.inky[1])
+            self.animationC.create_image(1.3*(pos+25),30,image=self.blinky[1])
             self.animationCounter -= 1
         else:
+            #change direction
             self.goingR = True
+        #recall function
         self.animationC.after(100, self.animation)
 
     #Pressing the start button
