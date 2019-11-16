@@ -25,15 +25,18 @@ class welcomeWnd:
         self.startB.configure(activebackground="black",activeforeground="gold4",bd=0)
         self.startB.pack()
         #high scores button
-        self.hScoreB = tk.Button(self.wnd, text="HIGH SCORES",command=self.highScoreD())
+        self.hScoreB = tk.Button(self.wnd, text="HIGH SCORES",command=self.highScoreD)
         self.hScoreB.configure(font=("fixedsys",20),bg="black",fg="cyan2",relief="flat")
         self.hScoreB.configure(activebackground="black",activeforeground="cyan4",bd=0)
         self.hScoreB.pack()
         #how to play button
-        self.hTPlayB = tk.Button(self.wnd, text="HOW TO PLAY",command=self.hTPlayD())
+        self.hTPlayB = tk.Button(self.wnd, text="HOW TO PLAY",command=self.hTPlayD)
         self.hTPlayB.configure(font=("fixedsys",20),bg="black",fg="SpringGreen2",relief="flat")
         self.hTPlayB.configure(activebackground="black",activeforeground="green4",bd=0)
         self.hTPlayB.pack()
+        #keeping track of the open windows
+        self.hScoreW = []
+        self.hTPlayW = []
         #animation
         #fixing position for animation canvas
         self.lb = tk.Label(self.wnd,height=2,bg="black")
@@ -57,7 +60,6 @@ class welcomeWnd:
         #calling animation function
         self.animationC.after(100, self.animation)
         #Doesnt allow users to rezie the window
-        #Must be added after adding everything in window
         self.wnd.resizable(0,0)
         #Add as the last attribute
         self.wnd.mainloop()
@@ -101,12 +103,51 @@ class welcomeWnd:
 
     #Pressing the high scores button to display hScore wnd
     def highScoreD(self):
-        pass
+        if self.hScoreW == [] or self.hScoreW[0].open == False:
+            self.hScoreW = [highScoreWnd()]
 
     #Pressing the hTPlay button to display
     def hTPlayD(self):
-        pass
+        if self.hTPlayW == [] or self.hTPlayW[0].open == False:
+            self.hTPlayW = [hTPlayWnd()]
 
+#highScore window
+class highScoreWnd:
+    def __init__(self):
+        #creating the window
+        self.wnd = tk.Toplevel()
+        self.wnd.title("Pac-Man High Scores")
+        self.wnd.configure(bg="black")
+        #call a method if the window was closed
+        self.wnd.protocol("WM_DELETE_WINDOW", self.wndClosed)
+        self.open = True
+        self.wnd.resizable(0,0)
+
+    #if the window was closed
+    def wndClosed(self):
+        self.open = False
+        #close window
+        self.wnd.destroy()
+
+#how to play window
+class hTPlayWnd:
+    def __init__(self):
+        #creating the window
+        self.wnd = tk.Toplevel()
+        self.wnd.title("How To Play Pac-Man")
+        self.wnd.configure(bg="black")
+        #call a method if the window was closed
+        self.wnd.protocol("WM_DELETE_WINDOW", self.wndClosed)
+        self.open = True
+        self.wnd.resizable(0,0)
+
+    #if the window was closed
+    def wndClosed(self):
+        self.open = False
+        #close window
+        self.wnd.destroy()
+
+#user / pacman character class
 class pacman:
     #Declare images for pacman animation
     faceingL = [pygame.image.load('pmL0.png'),pygame.image.load('pmL1.png'),
@@ -316,17 +357,24 @@ class wall:
         pygame.draw.rect(wnd,(255,0,0),self.hitbox,2)
 
 class food:
+    #pictures to display on the window
     foodPics = [pygame.image.load("food10.png"),pygame.image.load("food50.png")]
     def __init__(self,x,y,w):
+        #location
         self.x = x
         self.y = y
+        #dimensions
         self.width = 15
         self.length = 15
+        #how many points its worth
         self.worth = w
 
+    #function that displays the food object on the window
     def draw(self,wnd):
+        #food type dot
         if self.worth == 10:
             wnd.blit(self.foodPics[0],(self.x,self.y))
+        #food type pellet
         elif self.worth == 50:
             wnd.blit(self.foodPics[1],(self.x,self.y))
 
