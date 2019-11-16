@@ -203,6 +203,10 @@ class pacman:
         if self.vel[0] != 0:
             if self.validM([self.x + self.speed*self.vel[0],self.y]):
                 self.x += self.speed*self.vel[0]
+                if self.x < 0:
+                    self.x = 27*15
+                elif self.x > 27*15:
+                    self.x = 0
         elif self.vel[1] != 0:
             if self.validM([self.x,(self.y + self.speed*self.vel[1]*(-1))]):
                 self.y += self.speed*self.vel[1]*(-1)
@@ -306,6 +310,10 @@ class ghost:
         if self.vel[0] != 0:
             if self.validM([self.x + self.speed*self.vel[0],self.y]):
                 self.x += self.speed*self.vel[0]
+                if self.x < 0:
+                    self.x = 27*15
+                elif self.x > 27*15:
+                    self.x = 0
         if self.vel[1] != 0:
             if self.validM([self.x,self.y + self.speed*self.vel[1]*(-1)]):
                 self.y += self.speed*self.vel[1]*(-1)
@@ -346,10 +354,13 @@ class ghost:
 
 class wall: 
     def __init__(self,x,y,width,length):
+        #location
         self.x = x
         self.y = y
+        #dimensions
         self.width = width
         self.length = length
+        #rectangle in tuple used for displaying walls
         self.hitbox = (self.x,self.y,self.width,self.length)
 
     #draws wall block into window
@@ -490,13 +501,13 @@ class game:
         #draw food
         for f in self.foods:
             f.draw(self.wnd)
+        # drawing pacman
+        self.pac.draw(self.wnd)
         #drawing ghosts
         self.blinky.draw(self.wnd)
         self.pinky.draw(self.wnd)
         self.inky.draw(self.wnd)
         self.clyde.draw(self.wnd)
-        #drawing pacman
-        self.pac.draw(self.wnd)
 
         # updating window to show character
         pygame.display.update()
@@ -514,8 +525,8 @@ class game:
     def AddScore(self):
         #each if pacman character collides with any of foods
         for f in self.foods:
-            if f.x <= self.pac.x < (f.x + f.width) or f.x <= ((self.pac.x + self.pac.width) < (f.x + f.width)):
-                if f.y <= self.pac.y < (f.y + f.length) or f.y <= ((self.pac.y + self.pac.height) < (f.y + f.length)):
+            if f.x <= self.pac.x < (f.x + f.width) or f.x < ((self.pac.x + self.pac.width) < (f.x + f.width)):
+                if f.y <= self.pac.y < (f.y + f.length) or f.y < ((self.pac.y + self.pac.height) < (f.y + f.length)):
                     #add the food worth to score
                     self.score += f.worth
                     #remove food from foods list
