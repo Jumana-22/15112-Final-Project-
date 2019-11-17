@@ -251,11 +251,11 @@ class ghost:
         self.walls = w
 
     #calls AI method based on color / ghost type
-    def callAI(self,pacLocation):
+    def callAI(self,pacLocation,pacDir):
         if self.color == "red":
             self.blinkyAI(pacLocation)
         elif self.color == "pink":
-            self.blinkyAI(pacLocation)
+            self.pinkyAI(pacLocation,pacDir)
         elif self.color == "blue":
             self.blinkyAI(pacLocation)
         elif self.color == "orange":
@@ -265,6 +265,21 @@ class ghost:
     #responsible for movement decision
     def blinkyAI(self,pacLocation):
         self.target = pacLocation
+        possibleDir = self.possibleDirection()
+        self.minDistance(possibleDir)
+
+    #pink ghost (pinky) AI
+    #responsible for movement decision
+    def pinkyAI(self,pacLocation,pacDir):
+        #setting target location on pacman location and facing direction
+        if pacDir == [1,0]:
+            self.target = (pacLocation[0]+(15*4),pacLocation[1])
+        elif pacDir == [-1,0]:
+            self.target = (pacLocation[0]-(15*4),pacLocation[1])
+        elif pacDir == [0,1]:
+            self.target = (pacLocation[0]-(15*4),pacLocation[1]-(15*4))
+        elif pacDir == [0,-1]:
+            self.target = (pacLocation[0],pacLocation[1]+(15*4))
         possibleDir = self.possibleDirection()
         self.minDistance(possibleDir)
 
@@ -298,24 +313,36 @@ class ghost:
             possibleDir = [(1,0),(-1,0),(0,1)]
         elif self.vel == [0,-1]:
             possibleDir = [(1,0),(-1,0),(0,-1)]
+        #temparay copy of all possible direction to be used in for loop
         temp = list(possibleDir)
+        #for each possible direction check if it is a valid move(doesnt collid with wall)
         for direction in temp:
             if not self.validM([self.x + self.speed*direction[0],self.y + self.speed*direction[1]*(-1)]):
+                #remove direction from possible directions list if collided with wall
                 possibleDir.remove(direction)
         return possibleDir
 
     #moves ghost based on individual AI
-    def move(self,pacLocation):
-        self.callAI(pacLocation)
+    def move(self,pacLocation,pacDir):
+        #function that calls correct AI & decides on the direction of ghost movement
+        self.callAI(pacLocation,pacDir)
+        #if moving right or left
         if self.vel[0] != 0:
+            # make sure the move is valid
             if self.validM([self.x + self.speed*self.vel[0],self.y]):
+                # move the ghost
                 self.x += self.speed*self.vel[0]
+                #if the ghost goes though the tunnel from the left side
                 if self.x < 0:
                     self.x = 27*15
+                #if the ghost goes though the tunnel from the right side
                 elif self.x > 27*15:
                     self.x = 0
+        #if moving up or down
         if self.vel[1] != 0:
+            #make sure the move is valid
             if self.validM([self.x,self.y + self.speed*self.vel[1]*(-1)]):
+                #move the ghost
                 self.y += self.speed*self.vel[1]*(-1)
 
     # decides whether the movement is valid or not
@@ -516,10 +543,10 @@ class game:
         #move all the characters once
         #self.AddScore()
         self.pac.move()
-        self.blinky.move((self.pac.x,self.pac.y))
-        self.pinky.move((self.pac.x,self.pac.y))
-        self.inky.move((self.pac.x,self.pac.y))
-        self.clyde.move((self.pac.x,self.pac.y))
+        self.blinky.move((self.pac.x,self.pac.y),self.pac.vel)
+        self.pinky.move((self.pac.x,self.pac.y),self.pac.vel)
+        self.inky.move((self.pac.x,self.pac.y),self.pac.vel)
+        self.clyde.move((self.pac.x,self.pac.y),self.pac.vel)
         self.AddScore()
 
     def AddScore(self):
