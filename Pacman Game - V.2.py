@@ -153,10 +153,21 @@ class hTPlayWnd:
         self.wnd.protocol("WM_DELETE_WINDOW", self.wndClosed)
         #keeping track if the wnd is open or not
         self.open = True
-        #wnd heading
+        #wnd heading DeepSkyBlue3 DarkOrange2 oliveDrab2
         self.heading = tk.Label(self.wnd,text="HOW TO PLAY",font=("fixedsys",40))
-        self.heading.configure(bg="black",fg="white",pady=30,padx=200)
+        self.heading.configure(bg="black",fg="cyan",pady=30,padx=200)
         self.heading.pack()
+        #How to play instructions
+        self.instr = tk.Text(self.wnd,width=41,height=8,font=("fixedsys",30))
+        self.instr.configure(bg='black',fg="cyan4",bd=0)
+        #string of instructions to be displayed
+        self.instrMsg = "\n Move Pac-Man using Arrow or 'WASD' keys " + \
+                        "\n\n\tPause game using 'ESC' key" + \
+                        "\n\n\tUnpause game using 'c' key"
+        self.instr.insert(tk.END,self.instrMsg)
+        #to not allow user to modify textbox
+        self.instr.configure(state="disabled")
+        self.instr.pack()
         #Doesnt allow users to rezie the window
         self.wnd.resizable(0,0)
 
