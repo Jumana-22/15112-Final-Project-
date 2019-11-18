@@ -219,15 +219,23 @@ class pacman:
 
     #called to move pacman
     def move(self):
+        #if moving right or left
         if self.vel[0] != 0:
+            #make sure the move is valid
             if self.validM([self.x + self.speed*self.vel[0],self.y]):
+                #move to new location
                 self.x += self.speed*self.vel[0]
+                #if going though the tunnel from the left side
                 if self.x < 0:
                     self.x = 27*15
+                #if going though the tunnel from the right side
                 elif self.x > 27*15:
                     self.x = 0
+        #if moving up or down
         elif self.vel[1] != 0:
+            #make sure the move is valid
             if self.validM([self.x,(self.y + self.speed*self.vel[1]*(-1))]):
+                #move to new location
                 self.y += self.speed*self.vel[1]*(-1)
 
     #decides whether the movement is valid or not
@@ -511,10 +519,16 @@ class game:
         self.score = 0
         #if game is paused
         self.paused = False
+        #background music
+        #self.music = pygame.mixer.music.load("siren_2.wav")
         #start the level
         self.startGame()
 
     def startGame(self):
+        self.countDown()
+        #background music
+        self.music = pygame.mixer.music.load("siren_2.wav")
+        pygame.mixer.music.play(-1)
         while self.run and (not self.paused):
             #setting frames per second
             self.clock.tick(8)
@@ -530,6 +544,18 @@ class game:
         if self.run == False:
             #quiting pygame
             pygame.quit()
+
+    def countDown(self):
+        self.redrawGameWindow()
+        #display ready message
+        font = pygame.font.SysFont("comicsans",30)
+        font.set_italic(True)
+        readyTxt = font.render("READY!",-1,(255,0,0),(0,0,0))
+        self.wnd.blit(readyTxt,(11*15+5,20*15))
+        #update window
+        pygame.display.update()
+        #count down to start game
+        pygame.time.delay(2000)
 
     def getUserInput(self):
         #getting keys pressed
@@ -557,11 +583,13 @@ class game:
     #when the game is paused
     def pauseG(self):
         self.paused = True
-        # display pause message
+        #display pause message
         font = pygame.font.SysFont("comicsans",30)
         pauseTxt = font.render("PAUSED",1,(255,0,0),(0,0,0))
         self.wnd.blit(pauseTxt,(11*15+5,20*15))
         pygame.display.update()
+        #pause music
+        pygame.mixer.music.pause()
         while self.paused == True:
             #if window closed
             for event in pygame.event.get():
@@ -574,6 +602,8 @@ class game:
             #if unpaused
             if keys[pygame.K_c]:
                 self.paused = False
+                #unpause music
+                pygame.mixer.music.unpause()
 
     def redrawGameWindow(self):
         #resetting the window to black
