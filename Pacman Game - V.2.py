@@ -37,6 +37,9 @@ class welcomeWnd:
         #keeping track of the open windows
         self.hScoreW = []
         self.hTPlayW = []
+        #background music
+        self.music = pygame.mixer.music.load("welcomeM.wav")
+        pygame.mixer.music.play(-1)
         #animation
         #fixing position for animation canvas
         self.lb = tk.Label(self.wnd,height=2,bg="black")
@@ -98,7 +101,11 @@ class welcomeWnd:
 
     #Pressing the start button
     def startG(self):
+        #fadeout background music
+        pygame.mixer.music.fadeout(1000)
+        #destory windows
         self.wnd.destroy()
+        #start an instance of the game
         game()
 
     #Pressing the high scores button to display hScore wnd
@@ -120,7 +127,13 @@ class highScoreWnd:
         self.wnd.configure(bg="black")
         #call a method if the window was closed
         self.wnd.protocol("WM_DELETE_WINDOW", self.wndClosed)
+        #keeping track if the wnd is open or not
         self.open = True
+        #wnd heading
+        self.heading = tk.Label(self.wnd, text="HIGH SCORES", font=("fixedsys", 40))
+        self.heading.configure(bg="black", fg="white", pady=30, padx=200)
+        self.heading.pack()
+        #Doesnt allow users to rezie the window
         self.wnd.resizable(0,0)
 
     #if the window was closed
@@ -138,7 +151,13 @@ class hTPlayWnd:
         self.wnd.configure(bg="black")
         #call a method if the window was closed
         self.wnd.protocol("WM_DELETE_WINDOW", self.wndClosed)
+        #keeping track if the wnd is open or not
         self.open = True
+        #wnd heading
+        self.heading = tk.Label(self.wnd,text="HOW TO PLAY",font=("fixedsys",40))
+        self.heading.configure(bg="black",fg="white",pady=30,padx=200)
+        self.heading.pack()
+        #Doesnt allow users to rezie the window
         self.wnd.resizable(0,0)
 
     #if the window was closed
