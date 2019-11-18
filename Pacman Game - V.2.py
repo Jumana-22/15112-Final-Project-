@@ -251,21 +251,24 @@ class ghost:
         self.walls = w
 
     #calls AI method based on color / ghost type
-    def callAI(self,pacLocation,pacDir):
+    def callAI(self,pacLocation,pacDir,blinkyLoc):
         if self.color == "red":
             self.blinkyAI(pacLocation)
         elif self.color == "pink":
             self.pinkyAI(pacLocation,pacDir)
         elif self.color == "blue":
-            self.blinkyAI(pacLocation)
+            self.inkyAI(pacLocation,pacDir,blinkyLoc)
         elif self.color == "orange":
             self.blinkyAI(pacLocation)
 
     #red ghost (blinky) AI
     #responsible for movement decision
     def blinkyAI(self,pacLocation):
+        #set target coordinates
         self.target = pacLocation
+        #get possible travel direction from current location
         possibleDir = self.possibleDirection()
+        #travel in direction with shortest distance from target coordinates
         self.minDistance(possibleDir)
 
     #pink ghost (pinky) AI
@@ -280,7 +283,28 @@ class ghost:
             self.target = (pacLocation[0]-(15*4),pacLocation[1]-(15*4))
         elif pacDir == [0,-1]:
             self.target = (pacLocation[0],pacLocation[1]+(15*4))
+        #get possible travel direction from current location
         possibleDir = self.possibleDirection()
+        #travel in direction with shortest distance from target coordinates
+        self.minDistance(possibleDir)
+
+    #blue ghost (inky) AI
+    #responsible for movement decision
+    def inkyAI(self,pacLocation,pacDir,blinkyLoc):
+        #setting target location on pacman location and facing direction
+        if pacDir == [1,0]:
+            self.target = (pacLocation[0]+(15*2),pacLocation[1])
+        elif pacDir == [-1,0]:
+            self.target = (pacLocation[0]-(15*2),pacLocation[1])
+        elif pacDir == [0,1]:
+            self.target = (pacLocation[0]-(15*2),pacLocation[1] -(15*2))
+        elif pacDir == [0,-1]:
+            self.target = (pacLocation[0],pacLocation[1]+(15*2))
+        self.target = (self.target[0]-(blinkyLoc[0]-self.target[0]),
+                       self.target[1]-(blinkyLoc[1]-self.target[1]))
+        #get possible travel direction from current location
+        possibleDir = self.possibleDirection()
+        #travel in direction with shortest distance from target coordinates
         self.minDistance(possibleDir)
 
     def minDistance(self,possibleDir):
@@ -323,9 +347,9 @@ class ghost:
         return possibleDir
 
     #moves ghost based on individual AI
-    def move(self,pacLocation,pacDir):
+    def move(self,pacLocation,pacDir,blinkyLoc=(0,0)):
         #function that calls correct AI & decides on the direction of ghost movement
-        self.callAI(pacLocation,pacDir)
+        self.callAI(pacLocation,pacDir,blinkyLoc)
         #if moving right or left
         if self.vel[0] != 0:
             # make sure the move is valid
@@ -528,7 +552,7 @@ class game:
         #draw food
         for f in self.foods:
             f.draw(self.wnd)
-        # drawing pacman
+        #drawing pacman
         self.pac.draw(self.wnd)
         #drawing ghosts
         self.blinky.draw(self.wnd)
@@ -541,11 +565,10 @@ class game:
 
     def moveChars(self):
         #move all the characters once
-        #self.AddScore()
         self.pac.move()
         self.blinky.move((self.pac.x,self.pac.y),self.pac.vel)
         self.pinky.move((self.pac.x,self.pac.y),self.pac.vel)
-        self.inky.move((self.pac.x,self.pac.y),self.pac.vel)
+        self.inky.move((self.pac.x,self.pac.y),self.pac.vel,(self.blinky.x,self.blinky.y))
         self.clyde.move((self.pac.x,self.pac.y),self.pac.vel)
         self.AddScore()
 
