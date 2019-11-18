@@ -278,7 +278,7 @@ class ghost:
         elif self.color == "blue":
             self.inkyAI(pacLocation,pacDir,blinkyLoc)
         elif self.color == "orange":
-            self.blinkyAI(pacLocation)
+            self.clydeAI(pacLocation)
 
     #red ghost (blinky) AI
     #responsible for movement decision
@@ -324,6 +324,23 @@ class ghost:
         #get possible travel direction from current location
         possibleDir = self.possibleDirection()
         #travel in direction with shortest distance from target coordinates
+        self.minDistance(possibleDir)
+
+    #orange ghost (clyde) AI
+    #responsible for movement decision
+    def clydeAI(self, pacLocation):
+        #calculating distance between pac-man and orange ghost
+        distance = (((pacLocation[0]-self.x)**2)+((pacLocation[1]-self.y)**2))*(1/2)
+        #target coordinated dependent if ghost is more than 8 tiles away from pac-man
+        if distance <= (8*15):
+            #set target to bottom left corner
+            self.target = (0,31*15)
+        else:
+            #set target coordinates to pac-man location
+            self.target = pacLocation
+        # get possible travel direction from current location
+        possibleDir = self.possibleDirection()
+        # travel in direction with shortest distance from target coordinates
         self.minDistance(possibleDir)
 
     def minDistance(self,possibleDir):
