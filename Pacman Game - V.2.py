@@ -130,11 +130,45 @@ class highScoreWnd:
         #keeping track if the wnd is open or not
         self.open = True
         #wnd heading
-        self.heading = tk.Label(self.wnd, text="HIGH SCORES", font=("fixedsys", 40))
-        self.heading.configure(bg="black", fg="white", pady=30, padx=200)
+        self.heading = tk.Label(self.wnd,text="HIGH SCORES",font=("fixedsys", 40))
+        self.heading.configure(bg="black",fg="white",pady=30,padx=200)
         self.heading.pack()
+        #frame for table placment
+        self.frame = tk.Frame(self.wnd,bg="black")
+        self.frame.pack()
+        #list for each column
+        self.iconC = []
+        self.scores = []
+        self.names = []
+        #calling function which creates widgets for scores table
+        self.scoreTb()
+        #adding space at the botton of window
+        self.design = tk.Label(self.frame,bg="black",pady=10)
+        self.design.grid(column=0,row=5)
         #Doesnt allow users to rezie the window
         self.wnd.resizable(0,0)
+
+    #Displaying top 5 scores
+    def scoreTb(self):
+        #icons
+        self.iconsPics = [tk.PhotoImage(file='WpmR1.png'), tk.PhotoImage(file="WblinkyR.png"),
+                          tk.PhotoImage(file="WpinkyR.png"), tk.PhotoImage(file="WinkyR.png"),
+                          tk.PhotoImage(file="WclydeR.png")]
+        #creating 5 rows for each column
+        for i in range(5):
+            #Creating canvas widgets to put icons in
+            self.iconC.append(tk.Canvas(self.frame,width=50,height=50,bg="black",highlightthickness=0))
+            #adding image to canvas
+            self.iconC[i].create_image(25,25,image=self.iconsPics[i])
+            self.iconC[i].grid(column=0,row=i)
+            #Adding labels to display scores
+            self.scores.append(tk.Label(self.frame,font=("fixedsys",15),
+                                        text=str(i+1)+" - ##### ",bg="black",fg="white"))
+            self.scores[i].grid(column=1,row=i)
+            #adding labels to display player name
+            self.names.append(tk.Label(self.frame,font=("fixedsys",15),
+                                        text="---------",bg="black",fg="white"))
+            self.names[i].grid(column=2,row=i)
 
     #if the window was closed
     def wndClosed(self):
@@ -536,6 +570,7 @@ class game:
         self.startGame()
 
     def startGame(self):
+        #call game countdown function
         self.countDown()
         #background music
         self.music = pygame.mixer.music.load("siren_2.wav")
@@ -621,6 +656,14 @@ class game:
         self.wnd.fill((0,0,0))
         # resetting window to background
         self.wnd.blit(self.bg,(0,3*15))
+        #display score heading
+        font = pygame.font.SysFont("comicsans", 30)
+        scoreTxt = font.render("SCORE",2,(250,250,250),(0, 0, 0))
+        self.wnd.blit(scoreTxt,(11*15+10,5))
+        #current score
+        scoreStr = "0"*(4-len(str(self.score))) +str(self.score)
+        scoreN = font.render(scoreStr,1,(250,250,250),(0, 0, 0))
+        self.wnd.blit(scoreN,(12*15+10,25))
         """
         #drawing wall
         for w in self.walls:
