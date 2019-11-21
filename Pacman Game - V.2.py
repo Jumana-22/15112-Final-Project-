@@ -237,7 +237,7 @@ class pacman:
         #used for animation
         self.moveCount = 0
         #number of lives
-        self.lives = 3
+        self.lives = 4
 
         #walls that restrict movement
         self.walls = w
@@ -458,7 +458,7 @@ class ghost:
                 #move the ghost
                 self.y += self.speed*self.vel[1]*(-1)
 
-    # decides whether the movement is valid or not
+    #decides whether the movement is valid or not
     """Returns True if character doesnt collide with any walls
         Returns false if the character does collide with a wall"""
     def validM(self, location):
@@ -467,7 +467,7 @@ class ghost:
             if w.x <= location[0] < (w.x + w.width) or w.x < ((location[0] + self.width) < (w.x + w.width)):
                 if w.y <= location[1] < (w.y + w.length) or w.y < ((location[1] + self.height) < (w.y + w.length)):
                     return False
-        # Return True otherwise
+        #Return True otherwise
         return True
     
     #loads ghost into window
@@ -492,7 +492,7 @@ class ghost:
         elif self.color == "orange":
             return self.clydePics
 
-class wall: 
+class wall:
     def __init__(self,x,y,width,length):
         #location
         self.x = x
@@ -558,14 +558,16 @@ class game:
         self.inky = ghost(195,(11+3)*15,"blue",self.walls)
         self.clyde = ghost(195,(11+3)*15,"orange",self.walls)
 
+        #sound effects
+        self.eatingS = pygame.mixer.Sound("munch_1.wav")
+        self.deathPS = pygame.mixer.Sound("death_1.wav")
+
         #While the level is running
         self.run = True
         #current score
         self.score = 0
-        #if game is paused
+        #track if game is paused
         self.paused = False
-        #background music
-        #self.music = pygame.mixer.music.load("siren_2.wav")
         #start the level
         self.startGame()
 
@@ -580,6 +582,8 @@ class game:
             self.clock.tick(8)
             #updating window
             self.redrawGameWindow()
+            #cheching if ghosts and pac-man collided
+            self.charCollision()
             # getting all inputs from user like mouse movement
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -602,6 +606,7 @@ class game:
         pygame.display.update()
         #count down to start game
         pygame.time.delay(2000)
+        self.pac.lives = 3
 
     def getUserInput(self):
         #getting keys pressed
@@ -623,7 +628,7 @@ class game:
             if self.pac.validM([self.pac.x, self.pac.y + self.pac.speed]):
                 self.pac.vel = [0,-1]
         #pausing the game
-        if keys[pygame.K_SPACE] or keys[pygame.K_ESCAPE] or keys[pygame.K_p]:
+        if keys[pygame.K_ESCAPE]:
             self.pauseG()
 
     #when the game is paused
@@ -656,14 +661,8 @@ class game:
         self.wnd.fill((0,0,0))
         # resetting window to background
         self.wnd.blit(self.bg,(0,3*15))
-        #display score heading
-        font = pygame.font.SysFont("comicsans", 30)
-        scoreTxt = font.render("SCORE",2,(250,250,250),(0, 0, 0))
-        self.wnd.blit(scoreTxt,(11*15+10,5))
-        #current score
-        scoreStr = "0"*(4-len(str(self.score))) +str(self.score)
-        scoreN = font.render(scoreStr,1,(250,250,250),(0, 0, 0))
-        self.wnd.blit(scoreN,(12*15+10,25))
+        #display current score
+        self.drawScore()
         """
         #drawing wall
         for w in self.walls:
@@ -679,9 +678,28 @@ class game:
         self.pinky.draw(self.wnd)
         self.inky.draw(self.wnd)
         self.clyde.draw(self.wnd)
-
+        #draw lives
+        self.drawLives()
         # updating window to show character
         pygame.display.update()
+
+    #function that displays icons to show number of lives left
+    def drawLives(self):
+        #loading image
+        livesPic = pygame.image.load('pmR1.png')
+        #display 1 less than the amount of lives left
+        for i in range(self.pac.lives-1):
+            self.wnd.blit(livesPic,(i*20+5,34*15))
+
+    def drawScore(self):
+        #display score heading
+        font = pygame.font.SysFont("comicsans",30)
+        scoreTxt = font.render("SCORE",2,(250,250, 250),(0,0,0))
+        self.wnd.blit(scoreTxt,(11*15+10,5))
+        #current score
+        scoreStr = "0"*(4-len(str(self.score)))+str(self.score)
+        scoreN = font.render(scoreStr,1,(250,250,250),(0,0,0))
+        self.wnd.blit(scoreN,(12*15+10,25))
 
     def moveChars(self):
         #move all the characters once
@@ -697,10 +715,50 @@ class game:
         for f in self.foods:
             if f.x <= self.pac.x < (f.x + f.width) or f.x < ((self.pac.x + self.pac.width) < (f.x + f.width)):
                 if f.y <= self.pac.y < (f.y + f.length) or f.y < ((self.pac.y + self.pac.height) < (f.y + f.length)):
+                    #play sound effect
+                    self.eatingS.play()
                     #add the food worth to score
                     self.score += f.worth
                     #remove food from foods list
                     self.foods.pop(self.foods.index(f))
+
+    #collsion between characters
+    def charCollision(self):
+        #list with all ghosts locations
+        ghostsLoc = [(self.blinky.x,self.blinky.y),(self.pinky.x,self.pinky.y),
+                     (self.inky.x,self.inky.y),(self.clyde.x,self.clyde.y)]
+        #check if pac collides with any of the ghots
+        for i in ghostsLoc:
+            if i[0] == self.pac.x and i[1] == self.pac.y:
+                #calling death of pac animation
+                self.deathAni()
+                #ressting pac character to starting direction and location
+                self.pac.vel = [-1,0]
+                self.pac.x = 195
+                self.pac.y = (17+3)*15
+                #decreasing pac-man lives
+                self.pac.lives = self.pac.lives - 1
+
+    #pac-man death animation
+    def deathAni(self):
+        #pause bg music
+        pygame.mixer.music.pause()
+        self.deathPS.play()
+        #Pictures for animation
+        deathPics = [pygame.image.load("deathP0.png"),pygame.image.load("deathP1.png"),
+                     pygame.image.load("deathP2.png"),pygame.image.load("deathP3.png"),
+                     pygame.image.load("deathP4.png"),pygame.image.load("deathP5.png"),
+                     pygame.image.load("deathP6.png"),pygame.image.load("deathP7.png"),
+                     pygame.image.load("deathP8.png"),pygame.image.load("deathP9.png"),
+                     pygame.image.load("deathP10.png"),pygame.image.load("deathP11.png")]
+        #display each image
+        for i in range(len(deathPics)):
+            pygame.time.delay(210)
+            self.wnd.blit(deathPics[i],(self.pac.x,self.pac.y))
+            #update window
+            pygame.display.update()
+        #unpdause bg music
+        pygame.mixer.music.unpause()
 
     def createWalls(self):
         #borders / outer walls 
