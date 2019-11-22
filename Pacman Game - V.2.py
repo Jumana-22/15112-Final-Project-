@@ -211,6 +211,89 @@ class hTPlayWnd:
         #close window
         self.wnd.destroy()
 
+#End of the game window
+class endWnd:
+    def __init__(self,score,end):
+        #creating a tkinter window
+        self.wnd = tk.Tk()
+        self.wnd.title("Game End")
+        self.wnd.geometry("700x400")
+        self.wnd.configure(bg="black")
+        #saving the score the user got
+        self.score = score
+        #saving how the game was ended (lose or win)
+        self.end = end
+        #creating heading
+        self.hOptions = ["TRY AGAIN","CONGRATULATIONS"]
+        self.heading = tk.Label(self.wnd,bg="black",fg="yellow",pady=20)
+        self.heading.configure(text=self.hOptions[self.end],font=("fixedsys",50))
+        self.heading.pack()
+        #displaying the score
+        self.scoreL = tk.Label(self.wnd,bg="black",fg="white",font=("fixedsys",20),pady=20)
+        self.scoreL.configure(text="SCORE  " + "0"*(4-len(str(self.score))) + str(self.score))
+        self.scoreL.pack()
+        #player name
+        self.nameF = tk.Frame(self.wnd,bg="black")
+        self.nameF.pack()
+        self.nameL = tk.Label(self.nameF,text="NAME:",padx=15,bg="black",fg="white",font=("fixedsys",10))
+        self.nameL.grid(column=0,row=0)
+        #entery box for user to insert name
+        self.nameE = tk.Entry(self.nameF)
+        self.nameE.grid(column=1,row=0)
+        #button to save score and player name
+        self.saved = False
+        self.nameB = tk.Button(self.nameF,text="SUBMIT SCORE",padx=20,bg="black",fg="red",relief="flat",bd=0)
+        self.nameB.configure(font=("fixedsys",10),activebackground="black",activeforeground="red4",command=self.submit)
+        self.nameB.grid(column=3,row=0)
+        #for desgin placement
+        self.design = tk.Label(self.wnd,bg="black",height=4)
+        self.design.pack()
+        #frame to bottom buttons
+        self.buttonF = tk.Frame(self.wnd,bg="black")
+        self.buttonF.pack()
+        #button to play again
+        self.playB = tk.Button(self.buttonF,text="PLAY AGAIN",font=("fixedsys",20),bd=0,padx=10,command=self.playA)
+        self.playB.configure(bg="black",fg="yellow2",activebackground="black",activeforeground="gold4",relief="flat")
+        self.playB.grid(column=0,row=0)
+        #button to go back to welcome window
+        self.menuB = tk.Button(self.buttonF,text="MAIN MENU",font=("fixedsys",20),bd=0,padx=10,command=self.mainMenu)
+        self.menuB.configure(bg="black",fg="cyan2",activebackground="black",activeforeground="cyan4",relief="flat")
+        self.menuB.grid(column=1,row=0)
+        #button to quit application
+        self.quitB = tk.Button(self.buttonF,text="QUIT",font=("fixedsys",20),bd=0,padx=10,command=self.quit)
+        self.quitB.configure(bg="black",fg="red",activebackground="black",activeforeground="red4",relief="flat")
+        self.quitB.grid(column=2,row=0)
+        #Doesnt allow user to resize the window
+        self.wnd.resizable(0,0)
+        self.wnd.mainloop()
+
+    #function to submit score and player name
+    def submit(self):
+        if self.saved == False:
+            self.saved = True
+            name = self.nameE.get()
+            txt = "@@" + "0"*(4-len(str(self.score))) + str(self.score) + "@@" + name
+            print(txt)
+
+    #function for the play again bottom
+    def playA(self):
+        #close current window
+        self.wnd.destroy()
+        #create an instance of the game
+        game()
+
+    #function for the main menu button
+    def mainMenu(self):
+        #close current window
+        self.wnd.destroy()
+        #create an instance of the welcome wnd
+        welcomeWnd()
+
+    #function for quit button
+    def quit(self):
+        #close current window
+        self.wnd.destroy()
+
 #user / pacman character class
 class pacman:
     #Declare images for pacman animation
@@ -564,6 +647,8 @@ class game:
 
         #While the level is running
         self.run = True
+        #if the game has ended
+        self.end = False
         #current score
         self.score = 0
         #track if game is paused
@@ -590,8 +675,15 @@ class game:
                     # Close window without causing error message
                     self.run = False
             self.getUserInput()
+            #move all the characters
             self.moveChars()
-        if self.run == False:
+            #if the game has ended
+            if (self.pac.lives <= 0) or (self.foods == []):
+                pygame.mixer.music.stop()
+                self.run = False
+                self.end = True
+                self.endC()
+        if self.run == False and self.end == False:
             #quiting pygame
             pygame.quit()
 
@@ -701,6 +793,8 @@ class game:
         scoreN = font.render(scoreStr,1,(250,250,250),(0,0,0))
         self.wnd.blit(scoreN,(12*15+10,25))
 
+    #calls all the funcions to move all the charcater in the game
+    #also calls function for pac-man colliding with food objects (dots & pellets)
     def moveChars(self):
         #move all the characters once
         self.pac.move()
@@ -710,6 +804,8 @@ class game:
         self.clyde.move((self.pac.x,self.pac.y),self.pac.vel)
         self.AddScore()
 
+    #addes to the score when pac-man collides with foods
+    #Also removes food object from list if it collides with pac-man
     def AddScore(self):
         #each if pacman character collides with any of foods
         for f in self.foods:
@@ -759,6 +855,20 @@ class game:
             pygame.display.update()
         #unpdause bg music
         pygame.mixer.music.unpause()
+
+    #checks how the game has ended
+    #calls wnd for the end of the games
+    def endC(self):
+        if self.pac.lives <= 0:
+            #closing the game window
+            pygame.display.quit()
+            #create an instance of the end window
+            endWnd(self.score,0)
+        elif self.foods == []:
+            #closing the game window
+            pygame.display.quit()
+            #create an instance of the end window
+            endWnd(self.score,1)
 
     def createWalls(self):
         #borders / outer walls 
@@ -955,5 +1065,7 @@ class game:
         self.foods.append(food((1*15),((23+3)*15),50))
         self.foods.append(food((26*15),((23+3)*15),50))
 
+#The path for the folder with all the additional resources
+dir = "\\Resources\\"
 #Starting the application
 App = welcomeWnd()
