@@ -154,21 +154,28 @@ class highScoreWnd:
         self.iconsPics = [tk.PhotoImage(file='WpmR1.png'), tk.PhotoImage(file="WblinkyR.png"),
                           tk.PhotoImage(file="WpinkyR.png"), tk.PhotoImage(file="WinkyR.png"),
                           tk.PhotoImage(file="WclydeR.png")]
-        #creating 5 rows for each column
-        for i in range(5):
-            #Creating canvas widgets to put icons in
-            self.iconC.append(tk.Canvas(self.frame,width=50,height=50,bg="black",highlightthickness=0))
-            #adding image to canvas
-            self.iconC[i].create_image(25,25,image=self.iconsPics[i])
-            self.iconC[i].grid(column=0,row=i)
-            #Adding labels to display scores
-            self.scores.append(tk.Label(self.frame,font=("fixedsys",15),
-                                        text=str(i+1)+" - ##### ",bg="black",fg="white"))
-            self.scores[i].grid(column=1,row=i)
-            #adding labels to display player name
-            self.names.append(tk.Label(self.frame,font=("fixedsys",15),
-                                        text="---------",bg="black",fg="white"))
-            self.names[i].grid(column=2,row=i)
+        #opening file to get scores saves
+        with open("Scores.txt", "r") as f:
+            #creating 5 rows for each column
+            for i in range(5):
+                #Creating canvas widgets to put icons in
+                self.iconC.append(tk.Canvas(self.frame,width=50,height=50,bg="black",highlightthickness=0))
+                #adding image to canvas
+                self.iconC[i].create_image(25,25,image=self.iconsPics[i])
+                self.iconC[i].grid(column=0,row=i)
+                #getting data from file
+                info = f.readline().split("@@")[1:]
+                #if file has less than 5 scores saved
+                if info == []:
+                    info = ["0","---------"]
+                #Adding labels to display scores
+                self.scores.append(tk.Label(self.frame,font=("fixedsys",15),bg="black",fg="white",
+                                            text=str(i+1)+" - " + "0"*(4-len(info[0])) + info[0]))
+                self.scores[i].grid(column=1,row=i)
+                #adding labels to display player name
+                self.names.append(tk.Label(self.frame,font=("fixedsys",15),
+                                            text="  " + info[1].replace("\n",""),bg="black",fg="white"))
+                self.names[i].grid(column=2,row=i,sticky=tk.W)
 
     #if the window was closed
     def wndClosed(self):
