@@ -292,7 +292,7 @@ class endWnd:
         #read saved scores and player names & and them to the lists
         with open("Scores.txt", "r") as f:
             info = f.readline()
-            while info:
+            while info and info != "\n":
                 #split string into the seperate data
                 infoS = info.split("@@")[1:]
                 scoresL.append(int(infoS[0]))
