@@ -271,9 +271,51 @@ class endWnd:
     def submit(self):
         if self.saved == False:
             self.saved = True
+            #get name from user input
             name = self.nameE.get()
-            txt = "@@" + "0"*(4-len(str(self.score))) + str(self.score) + "@@" + name
-            print(txt)
+            #call function that will read stored data and sort it with new data
+            self.read_order(name)
+
+    #reads socres from file & order from from highest to lowest
+    def read_order(self,name):
+        #list to store player names
+        namesL = [name]
+        #list to store scores
+        scoresL = [self.score]
+        #read saved scores and player names & and them to the lists
+        with open("Scores.txt", "r") as f:
+            info = f.readline()
+            while info:
+                #split string into the seperate data
+                infoS = info.split("@@")[1:]
+                scoresL.append(int(infoS[0]))
+                namesL.append(infoS[1].replace("\n", ""))
+                info = f.readline()
+        #lists to store sorted data
+        newNameL = []
+        newScoreL = []
+        #integer used for loop
+        num = len(scoresL)
+        for i in range(num):
+            #add the data for the player with the highest score into sorted lists
+            newScoreL.append(max(scoresL))
+            newNameL.append(namesL[scoresL.index(max(scoresL))])
+            #remove data of the player with the highest score from list of unsorted data
+            namesL.pop(scoresL.index(max(scoresL)))
+            scoresL.pop(scoresL.index(max(scoresL)))
+        self.saveData(newNameL,newScoreL)
+
+    #function to save data into score file
+    def saveData(self,nameL,scoreL):
+        #lists to store all the data to save
+        newInfo = []
+        #join each player data together into 1 element in newInfo list
+        for i in range(len(scoreL)):
+            playerInfo = "@@" + str(scoreL[i]) + "@@" + nameL[i] + "\n"
+            newInfo.append(playerInfo)
+        #save the sorted infomation into file
+        with open("Scores.txt", "w") as f:
+            f.writelines(newInfo)
 
     #function for the play again bottom
     def playA(self):
