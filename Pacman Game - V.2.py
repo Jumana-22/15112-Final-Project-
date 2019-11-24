@@ -9,14 +9,16 @@ pygame.init()
 - How to play
 - Exit"""
 class welcomeWnd:
-    def __init__(self):
+    def __init__(self,dir):
+        #resources directoy
+        self.dir = dir
         #tkinter window
         self.wnd = tk.Tk()
         self.wnd.title("Welcome to Pac-Man")
         self.wnd.geometry("900x550")
         self.wnd.configure(bg="black")
         #Display Game Title
-        self.gameTPic = tk.PhotoImage(file="Pacman Title.png")
+        self.gameTPic = tk.PhotoImage(file=self.dir+"Pacman Title.png")
         self.gameTL = tk.Label(self.wnd,image=self.gameTPic,bd=0)
         self.gameTL.pack()
         #Start game button
@@ -38,7 +40,7 @@ class welcomeWnd:
         self.hScoreW = []
         self.hTPlayW = []
         #background music
-        self.music = pygame.mixer.music.load("welcomeM.wav")
+        self.music = pygame.mixer.music.load(self.dir+"welcomeM.wav")
         pygame.mixer.music.play(-1)
         #animation
         #fixing position for animation canvas
@@ -49,19 +51,19 @@ class welcomeWnd:
         self.animationCounter = 0
         #Declare images for animation
         #pacman images
-        self.faceingL = [tk.PhotoImage(file='WpmL0.png'), tk.PhotoImage(file='WpmL0.png'),
-                    tk.PhotoImage(file='WpmL2.png'), tk.PhotoImage(file='WpmL3.png')]
-        self.faceingR = [tk.PhotoImage(file='WpmR0.png'), tk.PhotoImage(file='WpmR1.png'),
-                    tk.PhotoImage(file='WpmR2.png'), tk.PhotoImage(file='WpmR3.png')]
+        self.faceingL = [tk.PhotoImage(file=self.dir+'WpmL0.png'), tk.PhotoImage(file=self.dir+'WpmL0.png'),
+                    tk.PhotoImage(file=self.dir+'WpmL2.png'), tk.PhotoImage(file=self.dir+'WpmL3.png')]
+        self.faceingR = [tk.PhotoImage(file=self.dir+'WpmR0.png'), tk.PhotoImage(file=self.dir+'WpmR1.png'),
+                    tk.PhotoImage(file=self.dir+'WpmR2.png'), tk.PhotoImage(file=self.dir+'WpmR3.png')]
         #ghosts images - [right direction, left direction]
-        self.blinky = [tk.PhotoImage(file="WblinkyR.png"),tk.PhotoImage(file="WblinkyL.png")]
-        self.pinky = [tk.PhotoImage(file="WpinkyR.png"),tk.PhotoImage(file="WpinkyL.png")]
-        self.inky = [tk.PhotoImage(file="WinkyR.png"),tk.PhotoImage(file="WinkyL.png")]
-        self.clyde = [tk.PhotoImage(file="WclydeR.png"),tk.PhotoImage(file="WclydeL.png")]
+        self.blinky = [tk.PhotoImage(file=self.dir+"WblinkyR.png"),tk.PhotoImage(file=self.dir+"WblinkyL.png")]
+        self.pinky = [tk.PhotoImage(file=self.dir+"WpinkyR.png"),tk.PhotoImage(file=self.dir+"WpinkyL.png")]
+        self.inky = [tk.PhotoImage(file=self.dir+"WinkyR.png"),tk.PhotoImage(file=self.dir+"WinkyL.png")]
+        self.clyde = [tk.PhotoImage(file=self.dir+"WclydeR.png"),tk.PhotoImage(file=self.dir+"WclydeL.png")]
         #keeping track of animation direction
         self.goingR = True
         #calling animation function
-        self.animationC.after(100, self.animation)
+        self.animationC.after(100,self.animation)
         #Doesnt allow users to rezie the window
         self.wnd.resizable(0,0)
         #Add as the last attribute
@@ -106,12 +108,12 @@ class welcomeWnd:
         #destory windows
         self.wnd.destroy()
         #start an instance of the game
-        game()
+        game(self.dir)
 
     #Pressing the high scores button to display hScore wnd
     def highScoreD(self):
         if self.hScoreW == [] or self.hScoreW[0].open == False:
-            self.hScoreW = [highScoreWnd()]
+            self.hScoreW = [highScoreWnd(self.dir)]
 
     #Pressing the hTPlay button to display
     def hTPlayD(self):
@@ -120,7 +122,9 @@ class welcomeWnd:
 
 #highScore window
 class highScoreWnd:
-    def __init__(self):
+    def __init__(self,dir):
+        #directory for resources
+        self.dir = dir
         #creating the window
         self.wnd = tk.Toplevel()
         self.wnd.title("Pac-Man High Scores")
@@ -151,11 +155,11 @@ class highScoreWnd:
     #Displaying top 5 scores
     def scoreTb(self):
         #icons
-        self.iconsPics = [tk.PhotoImage(file='WpmR1.png'), tk.PhotoImage(file="WblinkyR.png"),
-                          tk.PhotoImage(file="WpinkyR.png"), tk.PhotoImage(file="WinkyR.png"),
-                          tk.PhotoImage(file="WclydeR.png")]
+        self.iconsPics = [tk.PhotoImage(file=self.dir+'WpmR1.png'), tk.PhotoImage(file=self.dir+"WblinkyR.png"),
+                          tk.PhotoImage(file=self.dir+"WpinkyR.png"), tk.PhotoImage(file=self.dir+"WinkyR.png"),
+                          tk.PhotoImage(file=self.dir+"WclydeR.png")]
         #opening file to get scores saves
-        with open("Scores.txt", "r") as f:
+        with open(self.dir+"Scores.txt", "r") as f:
             #creating 5 rows for each column
             for i in range(5):
                 #Creating canvas widgets to put icons in
@@ -186,6 +190,7 @@ class highScoreWnd:
 #how to play window
 class hTPlayWnd:
     def __init__(self):
+        #directory for resources
         #creating the window
         self.wnd = tk.Toplevel()
         self.wnd.title("How To Play Pac-Man")
@@ -220,7 +225,9 @@ class hTPlayWnd:
 
 #End of the game window
 class endWnd:
-    def __init__(self,score,end):
+    def __init__(self,score,end,dir):
+        #directoy for resources
+        self.dir = dir
         #creating a tkinter window
         self.wnd = tk.Tk()
         self.wnd.title("Game End")
@@ -290,7 +297,7 @@ class endWnd:
         #list to store scores
         scoresL = [self.score]
         #read saved scores and player names & and them to the lists
-        with open("Scores.txt", "r") as f:
+        with open(self.dir+"Scores.txt", "r") as f:
             info = f.readline()
             while info and info != "\n":
                 #split string into the seperate data
@@ -321,7 +328,7 @@ class endWnd:
             playerInfo = "@@" + str(scoreL[i]) + "@@" + nameL[i] + "\n"
             newInfo.append(playerInfo)
         #save the sorted infomation into file
-        with open("Scores.txt", "w") as f:
+        with open(self.dir+"Scores.txt", "w") as f:
             f.writelines(newInfo)
 
     #function for the play again bottom
@@ -329,14 +336,14 @@ class endWnd:
         #close current window
         self.wnd.destroy()
         #create an instance of the game
-        game()
+        game(self.dir)
 
     #function for the main menu button
     def mainMenu(self):
         #close current window
         self.wnd.destroy()
         #create an instance of the welcome wnd
-        welcomeWnd()
+        welcomeWnd(self.dir)
 
     #function for quit button
     def quit(self):
@@ -345,16 +352,9 @@ class endWnd:
 
 #user / pacman character class
 class pacman:
-    #Declare images for pacman animation
-    faceingL = [pygame.image.load('pmL0.png'),pygame.image.load('pmL1.png'),
-                pygame.image.load('pmL2.png'),pygame.image.load('pmL3.png')]
-    faceingR = [pygame.image.load('pmR0.png'),pygame.image.load('pmR1.png'),
-                pygame.image.load('pmR2.png'),pygame.image.load('pmR3.png')]
-    faceingU = [pygame.image.load('pmU0.png'),pygame.image.load('pmU1.png'),
-                pygame.image.load('pmU2.png'),pygame.image.load('pmU3.png')]
-    faceingD = [pygame.image.load('pmD0.png'),pygame.image.load('pmD1.png'),
-                pygame.image.load('pmD2.png'),pygame.image.load('pmD3.png')]
-    def __init__(self,x,y,w):
+    def __init__(self,x,y,w,dir):
+        #direcitry for resources
+        self.dir = dir
         #Basic attributes
         #location
         self.x = x
@@ -370,9 +370,17 @@ class pacman:
         self.moveCount = 0
         #number of lives
         self.lives = 4
-
         #walls that restrict movement
         self.walls = w
+        #Declare images for pacman animation
+        self.faceingL = [pygame.image.load(self.dir+'pmL0.png'), pygame.image.load(self.dir+'pmL1.png'),
+                         pygame.image.load(self.dir+'pmL2.png'), pygame.image.load(self.dir+'pmL3.png')]
+        self.faceingR = [pygame.image.load(self.dir+'pmR0.png'), pygame.image.load(self.dir+'pmR1.png'),
+                         pygame.image.load(self.dir+'pmR2.png'), pygame.image.load(self.dir+'pmR3.png')]
+        self.faceingU = [pygame.image.load(self.dir+'pmU0.png'), pygame.image.load(self.dir+'pmU1.png'),
+                         pygame.image.load(self.dir+'pmU2.png'), pygame.image.load(self.dir+'pmU3.png')]
+        self.faceingD = [pygame.image.load(self.dir+'pmD0.png'), pygame.image.load(self.dir+'pmD1.png'),
+                         pygame.image.load(self.dir+'pmD2.png'), pygame.image.load(self.dir+'pmD3.png')]
 
     #loads pacman into window
     def draw(self,wnd):
@@ -428,15 +436,9 @@ class pacman:
         return True
 
 class ghost:
-    blinkyPics = [pygame.image.load("blinkyL.png"),pygame.image.load("blinkyR.png"),
-                  pygame.image.load("blinkyU.png"),pygame.image.load("blinkyD.png")]
-    pinkyPics = [pygame.image.load("pinkyL.png"),pygame.image.load("pinkyR.png"),
-                 pygame.image.load("pinkyU.png"),pygame.image.load("pinkyD.png")]
-    inkyPics = [pygame.image.load("inkyL.png"),pygame.image.load("inkyR.png"),
-                pygame.image.load("inkyU.png"),pygame.image.load("inkyD.png")]
-    clydePics = [pygame.image.load("clydeL.png"),pygame.image.load("clydeR.png"),
-                 pygame.image.load("clydeU.png"),pygame.image.load("clydeD.png")]
-    def __init__(self,x,y,c,w):
+    def __init__(self,x,y,c,w,dir):
+        #directory for resources
+        self.dir = dir
         #ghost location
         self.x = x
         self.y = y
@@ -448,7 +450,16 @@ class ghost:
         self.vel = [-1, 0]
         #ghost type
         self.color = c
-        #ghost design / look
+        #images used for diplay
+        self.blinkyPics = [pygame.image.load(self.dir+"blinkyL.png"), pygame.image.load(self.dir+"blinkyR.png"),
+                           pygame.image.load(self.dir+"blinkyU.png"), pygame.image.load(self.dir+"blinkyD.png")]
+        self.pinkyPics = [pygame.image.load(self.dir+"pinkyL.png"), pygame.image.load(self.dir+"pinkyR.png"),
+                          pygame.image.load(self.dir+"pinkyU.png"), pygame.image.load(self.dir+"pinkyD.png")]
+        self.inkyPics = [pygame.image.load(self.dir+"inkyL.png"), pygame.image.load(self.dir+"inkyR.png"),
+                         pygame.image.load(self.dir+"inkyU.png"), pygame.image.load(self.dir+"inkyD.png")]
+        self.clydePics = [pygame.image.load(self.dir+"clydeL.png"), pygame.image.load(self.dir+"clydeR.png"),
+                          pygame.image.load(self.dir+"clydeU.png"), pygame.image.load(self.dir+"clydeD.png")]
+        #ghost design / look based on type (color)
         self.images = self.setImages()
         self.target = (0,0)
         #walls in the game used for ghost AI
@@ -640,15 +651,17 @@ class wall:
         pygame.draw.rect(wnd,(255,0,0),self.hitbox,2)
 
 class food:
-    #pictures to display on the window
-    foodPics = [pygame.image.load("food10.png"),pygame.image.load("food50.png")]
     def __init__(self,x,y,w):
+        #directory for resources
+        self.dir = "Resources\\"
         #location
         self.x = x
         self.y = y
         #dimensions
         self.width = 15
         self.length = 15
+        #pictures to display on the window
+        self.foodPics = [pygame.image.load(self.dir+"food10.png"), pygame.image.load(self.dir+"food50.png")]
         #how many points its worth
         self.worth = w
 
@@ -662,15 +675,17 @@ class food:
             wnd.blit(self.foodPics[1],(self.x,self.y))
 
 class game:
-    def __init__(self):
+    def __init__(self,dir):
+        #directory for resources
+        self.dir = dir
         #Creating game window
         self.wnd = pygame.display.set_mode((28*15,(31+5)*15))
         #Setting window name 
         pygame.display.set_caption("PACMAN")
         #level background
-        self.bg = pygame.image.load("background.png")
+        self.bg = pygame.image.load(self.dir+"background.png")
         # resetting window to all black
-        self.wnd.blit(self.bg, (0, 3 * 15))
+        self.wnd.blit(self.bg,(0,3 *15))
 
         #game clock
         self.clock = pygame.time.Clock()
@@ -683,16 +698,16 @@ class game:
         self.foods = []
         self.createFoods()
         #pacman character
-        self.pac = pacman(195,(17+3)*15,self.walls)
+        self.pac = pacman(195,(17+3)*15,self.walls,self.dir)
         #The 4 ghosts
-        self.blinky = ghost(195,(11+3)*15,"red",self.walls)
-        self.pinky = ghost(195,(11+3)*15,"pink",self.walls)
-        self.inky = ghost(195,(11+3)*15,"blue",self.walls)
-        self.clyde = ghost(195,(11+3)*15,"orange",self.walls)
+        self.blinky = ghost(195,(11+3)*15,"red",self.walls,self.dir)
+        self.pinky = ghost(195,(11+3)*15,"pink",self.walls,self.dir)
+        self.inky = ghost(195,(11+3)*15,"blue",self.walls,self.dir)
+        self.clyde = ghost(195,(11+3)*15,"orange",self.walls,self.dir)
 
         #sound effects
-        self.eatingS = pygame.mixer.Sound("munch_1.wav")
-        self.deathPS = pygame.mixer.Sound("death_1.wav")
+        self.eatingS = pygame.mixer.Sound(self.dir+"munch_1.wav")
+        self.deathPS = pygame.mixer.Sound(self.dir+"death_1.wav")
 
         #While the level is running
         self.run = True
@@ -709,7 +724,7 @@ class game:
         #call game countdown function
         self.countDown()
         #background music
-        self.music = pygame.mixer.music.load("siren_2.wav")
+        self.music = pygame.mixer.music.load(self.dir+"siren_2.wav")
         pygame.mixer.music.play(-1)
         while self.run and (not self.paused):
             #setting frames per second
@@ -827,7 +842,7 @@ class game:
     #function that displays icons to show number of lives left
     def drawLives(self):
         #loading image
-        livesPic = pygame.image.load('pmR1.png')
+        livesPic = pygame.image.load(self.dir+'pmR1.png')
         #display 1 less than the amount of lives left
         for i in range(self.pac.lives-1):
             self.wnd.blit(livesPic,(i*20+5,34*15))
@@ -890,12 +905,12 @@ class game:
         pygame.mixer.music.pause()
         self.deathPS.play()
         #Pictures for animation
-        deathPics = [pygame.image.load("deathP0.png"),pygame.image.load("deathP1.png"),
-                     pygame.image.load("deathP2.png"),pygame.image.load("deathP3.png"),
-                     pygame.image.load("deathP4.png"),pygame.image.load("deathP5.png"),
-                     pygame.image.load("deathP6.png"),pygame.image.load("deathP7.png"),
-                     pygame.image.load("deathP8.png"),pygame.image.load("deathP9.png"),
-                     pygame.image.load("deathP10.png"),pygame.image.load("deathP11.png")]
+        deathPics = [pygame.image.load(self.dir+"deathP0.png"),pygame.image.load(self.dir+"deathP1.png"),
+                     pygame.image.load(self.dir+"deathP2.png"),pygame.image.load(self.dir+"deathP3.png"),
+                     pygame.image.load(self.dir+"deathP4.png"),pygame.image.load(self.dir+"deathP5.png"),
+                     pygame.image.load(self.dir+"deathP6.png"),pygame.image.load(self.dir+"deathP7.png"),
+                     pygame.image.load(self.dir+"deathP8.png"),pygame.image.load(self.dir+"deathP9.png"),
+                     pygame.image.load(self.dir+"deathP10.png"),pygame.image.load(self.dir+"deathP11.png")]
         #display each image
         for i in range(len(deathPics)):
             pygame.time.delay(210)
@@ -912,12 +927,12 @@ class game:
             #closing the game window
             pygame.display.quit()
             #create an instance of the end window
-            endWnd(self.score,0)
+            endWnd(self.score,0,self.dir)
         elif self.foods == []:
             #closing the game window
             pygame.display.quit()
             #create an instance of the end window
-            endWnd(self.score,1)
+            endWnd(self.score,1,self.dir)
 
     def createWalls(self):
         #borders / outer walls 
@@ -1115,6 +1130,6 @@ class game:
         self.foods.append(food((26*15),((23+3)*15),50))
 
 #The path for the folder with all the additional resources
-dir = "\\Resources\\"
+dir = "Resources\\"
 #Starting the application
-App = welcomeWnd()
+App = welcomeWnd(dir)
