@@ -6,3 +6,5 @@ For the code to work it needs to be run using python 3 and the following librari
 Libraries:
   -tkinter
   -pygame 
+
+Additionally the folder named "Resources" need to be downloaded and be in the same directory (folder) as the python game file
