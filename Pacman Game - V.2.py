@@ -436,7 +436,7 @@ class pacman:
         return True
 
 class ghost:
-    def __init__(self,x,y,c,w,dir):
+    def __init__(self,x,y,c,w,mode,dir):
         #directory for resources
         self.dir = dir
         #ghost location
@@ -448,6 +448,8 @@ class ghost:
         #ghost motion variables
         self.speed = 15
         self.vel = [-1, 0]
+        #current mode
+        self.mode = mode
         #ghost type
         self.color = c
         #images used for diplay
@@ -461,6 +463,7 @@ class ghost:
                           pygame.image.load(self.dir+"clydeU.png"), pygame.image.load(self.dir+"clydeD.png")]
         #ghost design / look based on type (color)
         self.images = self.setImages()
+        #target coordinates
         self.target = (0,0)
         #walls in the game used for ghost AI
         self.walls = w
@@ -479,8 +482,12 @@ class ghost:
     #red ghost (blinky) AI
     #responsible for movement decision
     def blinkyAI(self,pacLocation):
-        #set target coordinates
-        self.target = pacLocation
+        #motion based on current mode
+        if self.mode == "chase":
+            #set target coordinates
+            self.target = pacLocation
+        elif self.mode == "scatter":
+            self.target = (25*15,-1*15)
         #get possible travel direction from current location
         possibleDir = self.possibleDirection()
         #travel in direction with shortest distance from target coordinates
@@ -489,15 +496,19 @@ class ghost:
     #pink ghost (pinky) AI
     #responsible for movement decision
     def pinkyAI(self,pacLocation,pacDir):
-        #setting target location on pacman location and facing direction
-        if pacDir == [1,0]:
-            self.target = (pacLocation[0]+(15*4),pacLocation[1])
-        elif pacDir == [-1,0]:
-            self.target = (pacLocation[0]-(15*4),pacLocation[1])
-        elif pacDir == [0,1]:
-            self.target = (pacLocation[0]-(15*4),pacLocation[1]-(15*4))
-        elif pacDir == [0,-1]:
-            self.target = (pacLocation[0],pacLocation[1]+(15*4))
+        #motion based on current mode
+        if self.mode == "chase":
+            #setting target location on pacman location and facing direction
+            if pacDir == [1,0]:
+                self.target = (pacLocation[0]+(15*4),pacLocation[1])
+            elif pacDir == [-1,0]:
+                self.target = (pacLocation[0]-(15*4),pacLocation[1])
+            elif pacDir == [0,1]:
+                self.target = (pacLocation[0]-(15*4),pacLocation[1]-(15*4))
+            elif pacDir == [0,-1]:
+                self.target = (pacLocation[0],pacLocation[1]+(15*4))
+        elif self.mode == "scatter":
+            self.target = (2*15,-1*15)
         #get possible travel direction from current location
         possibleDir = self.possibleDirection()
         #travel in direction with shortest distance from target coordinates
@@ -506,17 +517,21 @@ class ghost:
     #blue ghost (inky) AI
     #responsible for movement decision
     def inkyAI(self,pacLocation,pacDir,blinkyLoc):
-        #setting target location on pacman location and facing direction
-        if pacDir == [1,0]:
-            self.target = (pacLocation[0]+(15*2),pacLocation[1])
-        elif pacDir == [-1,0]:
-            self.target = (pacLocation[0]-(15*2),pacLocation[1])
-        elif pacDir == [0,1]:
-            self.target = (pacLocation[0]-(15*2),pacLocation[1] -(15*2))
-        elif pacDir == [0,-1]:
-            self.target = (pacLocation[0],pacLocation[1]+(15*2))
-        self.target = (self.target[0]-(blinkyLoc[0]-self.target[0]),
-                       self.target[1]-(blinkyLoc[1]-self.target[1]))
+        #motion based on current mode
+        if self.mode == "chase":
+            #setting target location on pacman location and facing direction
+            if pacDir == [1,0]:
+                self.target = (pacLocation[0]+(15*2),pacLocation[1])
+            elif pacDir == [-1,0]:
+                self.target = (pacLocation[0]-(15*2),pacLocation[1])
+            elif pacDir == [0,1]:
+                self.target = (pacLocation[0]-(15*2),pacLocation[1] -(15*2))
+            elif pacDir == [0,-1]:
+                self.target = (pacLocation[0],pacLocation[1]+(15*2))
+            self.target = (self.target[0]-(blinkyLoc[0]-self.target[0]),
+                           self.target[1]-(blinkyLoc[1]-self.target[1]))
+        elif self.mode == "scatter":
+            self.target = (27*15,31*15)
         #get possible travel direction from current location
         possibleDir = self.possibleDirection()
         #travel in direction with shortest distance from target coordinates
@@ -528,7 +543,7 @@ class ghost:
         #calculating distance between pac-man and orange ghost
         distance = (((pacLocation[0]-self.x)**2)+((pacLocation[1]-self.y)**2))*(1/2)
         #target coordinated dependent if ghost is more than 8 tiles away from pac-man
-        if distance <= (8*15):
+        if distance <= (8*15) or self.mode == "scatter":
             #set target to bottom left corner
             self.target = (0,31*15)
         else:
@@ -689,7 +704,6 @@ class game:
 
         #game clock
         self.clock = pygame.time.Clock()
-
         #game objects
         #walls
         self.walls = []
@@ -700,15 +714,17 @@ class game:
         #pacman character
         self.pac = pacman(195,(17+3)*15,self.walls,self.dir)
         #The 4 ghosts
-        self.blinky = ghost(195,(11+3)*15,"red",self.walls,self.dir)
-        self.pinky = ghost(195,(11+3)*15,"pink",self.walls,self.dir)
-        self.inky = ghost(195,(11+3)*15,"blue",self.walls,self.dir)
-        self.clyde = ghost(195,(11+3)*15,"orange",self.walls,self.dir)
+        self.blinky = ghost(195,(11+3)*15,"red",self.walls,"scatter",self.dir)
+        self.pinky = ghost(195,(11+3)*15,"pink",self.walls,"scatter",self.dir)
+        self.inky = ghost(195,(11+3)*15,"blue",self.walls,"scatter",self.dir)
+        self.clyde = ghost(195,(11+3)*15,"orange",self.walls,"scatter",self.dir)
 
         #sound effects
         self.eatingS = pygame.mixer.Sound(self.dir+"munch_1.wav")
         self.deathPS = pygame.mixer.Sound(self.dir+"death_1.wav")
 
+        #game time
+        self.time = 0
         #While the level is running
         self.run = True
         #if the game has ended
@@ -731,14 +747,14 @@ class game:
             self.clock.tick(8)
             #updating window
             self.redrawGameWindow()
-            #cheching if ghosts and pac-man collided
-            self.charCollision()
             # getting all inputs from user like mouse movement
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     # Close window without causing error message
                     self.run = False
             self.getUserInput()
+            #make changes to ghosts modes if needed
+            self.changeGM()
             #move all the characters
             self.moveChars()
             #if the game has ended
@@ -747,6 +763,8 @@ class game:
                 self.run = False
                 self.end = True
                 self.endC()
+            #incrementing game time
+            self.time += 1
         if self.run == False and self.end == False:
             #quiting pygame
             pygame.quit()
@@ -862,10 +880,14 @@ class game:
     def moveChars(self):
         #move all the characters once
         self.pac.move()
+        #checking if ghosts and pac-man collided
+        self.charCollision()
         self.blinky.move((self.pac.x,self.pac.y),self.pac.vel)
         self.pinky.move((self.pac.x,self.pac.y),self.pac.vel)
         self.inky.move((self.pac.x,self.pac.y),self.pac.vel,(self.blinky.x,self.blinky.y))
         self.clyde.move((self.pac.x,self.pac.y),self.pac.vel)
+        #checking if ghosts and pac-man collided
+        self.charCollision()
         self.AddScore()
 
     #addes to the score when pac-man collides with foods
@@ -881,6 +903,22 @@ class game:
                     self.score += f.worth
                     #remove food from foods list
                     self.foods.pop(self.foods.index(f))
+
+    #method to change the ghosts modes
+    def changeGM(self):
+        #if the timer is any of these time change ghost modes to "chase"
+        if self.time == 70 or self.time == 340 or self.time == 590 or self.time == 840:
+            self.blinky.mode = "chase"
+            self.pinky.mode = "chase"
+            self.inky.mode = "chase"
+            self.clyde.mode = "chase"
+        #if the timer is any of these time change ghost modes to "scatter"
+        elif self.time == 270 or self.time == 540 or self.time == 790:
+            self.blinky.mode = "scatter"
+            self.pinky.mode = "scatter"
+            self.inky.mode = "scatter"
+            self.clyde.mode = "scatter"
+
 
     #collsion between characters
     def charCollision(self):
@@ -903,6 +941,9 @@ class game:
     def deathAni(self):
         #pause bg music
         pygame.mixer.music.pause()
+        #redrawdisplay
+        self.redrawGameWindow()
+        #play pac-man death sound affect
         self.deathPS.play()
         #Pictures for animation
         deathPics = [pygame.image.load(self.dir+"deathP0.png"),pygame.image.load(self.dir+"deathP1.png"),
