@@ -17,6 +17,8 @@ class welcomeWnd:
         self.wnd.title("Welcome to Pac-Man")
         self.wnd.geometry("900x550")
         self.wnd.configure(bg="black")
+        #call a method if the wnd was closed
+        self.wnd.protocol("WM_DELETE_WINDOW")
         #Display Game Title
         self.gameTPic = tk.PhotoImage(file=self.dir+"Pacman Title.png")
         self.gameTL = tk.Label(self.wnd,image=self.gameTPic,bd=0)
@@ -63,7 +65,7 @@ class welcomeWnd:
         #keeping track of animation direction
         self.goingR = True
         #calling animation function
-        self.animationC.after(100,self.animation)
+        self.nextAni = self.animationC.after(100,self.animation)
         #Doesnt allow users to rezie the window
         self.wnd.resizable(0,0)
         #Add as the last attribute
@@ -99,13 +101,14 @@ class welcomeWnd:
             #change direction
             self.goingR = True
         #recall function
-        self.animationC.after(100, self.animation)
+        self.nextAni = self.animationC.after(100, self.animation)
 
     #Pressing the start button
     def startG(self):
         #fadeout background music
         pygame.mixer.music.fadeout(1000)
         #destory windows
+        self.animationC.after_cancel(self.nextAni)
         self.wnd.destroy()
         #start an instance of the game
         game(self.dir)
@@ -119,6 +122,12 @@ class welcomeWnd:
     def hTPlayD(self):
         if self.hTPlayW == [] or self.hTPlayW[0].open == False:
             self.hTPlayW = [hTPlayWnd()]
+
+    #if the window was closed
+    def wndClosed(self):
+        self.animationC.after_cancel(self.nextAni)
+        self.wnd.destroy()
+
 
 #highScore window
 class highScoreWnd:
@@ -712,7 +721,7 @@ class game:
         self.foods = []
         self.createFoods()
         #pacman character
-        self.pac = pacman(195,(17+3)*15,self.walls,self.dir)
+        self.pac = pacman(195,(23+3)*15,self.walls,self.dir)
         #The 4 ghosts
         self.blinky = ghost(195,(11+3)*15,"red",self.walls,"scatter",self.dir)
         self.pinky = ghost(195,(11+3)*15,"pink",self.walls,"scatter",self.dir)
@@ -763,10 +772,8 @@ class game:
                 self.run = False
                 self.end = True
                 self.endC()
-            #incrementing game time
             self.time += 1
         if self.run == False and self.end == False:
-            #quiting pygame
             pygame.quit()
 
     def countDown(self):
@@ -933,9 +940,19 @@ class game:
                 #ressting pac character to starting direction and location
                 self.pac.vel = [-1,0]
                 self.pac.x = 195
-                self.pac.y = (17+3)*15
+                self.pac.y = (23+3)*15
                 #decreasing pac-man lives
                 self.pac.lives = self.pac.lives - 1
+                self.resetGhostLoc()
+
+    #reset ghosts location if in pac-man spawning area
+    def resetGhostLoc(self):
+        ghosts = [self.blinky,self.pinky,self.inky,self.clyde]
+        for g in ghosts:
+            if (195-45 <= g.x <= 195+45) and g.y == (23+3)*15:
+                g.x = 195
+                g.y = (11+3)*15
+                g.vel = [-1,0]
 
     #pac-man death animation
     def deathAni(self):
