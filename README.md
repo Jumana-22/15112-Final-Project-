@@ -10,7 +10,11 @@ Libraries:
 Additionally the folder named "Resources" need to be downloaded and be in the same directory (folder) as the python game file
 
 Raw Images and Sounds files from:
+
 Welcome Window Heading: https://www.ssbwiki.com/File:Pac-Man_title.png
+
 Game background:        https://www.spriters-resource.com/arcade/pacman/sheet/52631/
+
 Character Sprites Map:  https://github.com/rm-hull/big-bang/tree/master/examples/pacman
+
 Sounds:                 https://www.sounds-resource.com/arcade/pacman/sound/10603/
