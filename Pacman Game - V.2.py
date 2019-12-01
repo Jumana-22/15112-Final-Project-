@@ -373,7 +373,7 @@ class pacman:
         self.vel = [-1,0]
         #moveCount is used for animation
         self.moveCount = 0
-        self.lives = 4
+        self.lives = 3
         self.walls = w
         #Declare images for pacman animation
         self.faceingL = [pygame.image.load(self.dir+'pmL0.png'), pygame.image.load(self.dir+'pmL1.png'),
@@ -767,7 +767,6 @@ class game:
         self.wnd.blit(readyTxt,(11*15+5,20*15))
         pygame.display.update()
         pygame.time.delay(2000)
-        self.pac.lives = 3
 
     def getUserInput(self):
         """Gets input from user and make appropriate changes.
@@ -830,7 +829,7 @@ class game:
     def drawLives(self):
         """displays icons that represent how many chances (lives) pac-man has"""
         livesPic = pygame.image.load(self.dir+'pmR1.png')
-        for i in range(self.pac.lives-1):
+        for i in range(self.pac.lives):
             self.wnd.blit(livesPic,(i*20+5,34*15))
 
     def drawScore(self):
