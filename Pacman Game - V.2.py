@@ -903,7 +903,7 @@ class game:
         coordinated from the start of the game"""
         ghosts = [self.blinky,self.pinky,self.inky,self.clyde]
         for g in ghosts:
-            if (195-45 <= g.x <= 195+45) and g.y == (23+3)*15:
+            if (195-(6*15) <= g.x <= 195+(7*15)) and g.y == (23+3)*15:
                 g.x = 195
                 g.y = (11+3)*15
                 g.vel = [-1,0]
